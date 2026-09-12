@@ -1,0 +1,21 @@
+{
+  "name": "project-standards",
+  "interface": {
+    "displayName": "Project Standards"
+  },
+  "plugins": [
+    {
+      "name": "project-standards",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/hmes98318/project-standards.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

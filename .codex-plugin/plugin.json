@@ -1,0 +1,39 @@
+{
+  "name": "project-standards",
+  "version": "0.1.0",
+  "description": "Inspect repositories and create or update durable, application-scoped development standards and agent instruction routing.",
+  "author": {
+    "name": "hmes98318",
+    "url": "https://github.com/hmes98318"
+  },
+  "homepage": "https://github.com/hmes98318/project-standards",
+  "repository": "https://github.com/hmes98318/project-standards",
+  "license": "MIT",
+  "keywords": [
+    "development-standards",
+    "coding-standards",
+    "development-guidelines",
+    "repository-guidelines",
+    "agent-instructions",
+    "agents-md",
+    "coding-style",
+    "agent-skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Standards",
+    "shortDescription": "Create and maintain repository development standards",
+    "longDescription": "Inspect a repository, identify application scopes and tooling, and create or update durable development standards with AGENTS.md routing and optional Claude Code adapters.",
+    "developerName": "hmes98318",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/hmes98318/project-standards",
+    "defaultPrompt": [
+      "Inspect this repository and create or update its project development standards."
+    ]
+  }
+}

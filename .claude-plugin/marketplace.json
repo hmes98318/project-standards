@@ -1,0 +1,26 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-marketplace.json",
+  "name": "project-standards",
+  "owner": {
+    "name": "hmes98318",
+    "url": "https://github.com/hmes98318"
+  },
+  "metadata": {
+    "description": "Project Standards skill for repository development standards.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "project-standards",
+      "source": "./",
+      "description": "Inspect a repository and create or update durable, application-scoped development standards and agent instruction routing.",
+      "category": "development",
+      "keywords": [
+        "development-standards",
+        "agents",
+        "repository",
+        "workflow"
+      ]
+    }
+  ]
+}

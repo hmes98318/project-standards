@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Standards"
+  short_description: "Create and maintain repository development standards"
+  default_prompt: "Inspect this repository and create or update its project development standards."
