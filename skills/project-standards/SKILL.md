@@ -79,7 +79,7 @@ Application standards must use the canonical filenames below. Create only files 
 
 - `development.md` — application-specific engineering practices, framework and dependency usage rules, build/configuration practices, generated-code policies, and durable implementation constraints.
 - `coding-style.md` — language and framework coding style, naming, formatting, comments, and code-structure conventions.
-- `testing.md` — testing strategy, test-writing rules, validation expectations, and test-tooling conventions.
+- `testing.md` — automated-testing policy, test-surface requirements, testing depth, change obligations, integration dependency strategy, test-writing rules, and test-tooling conventions.
 - `security-privacy.md` — security, authentication, authorization, secrets, sensitive data, privacy, permissions, and related safeguards.
 - `data.md` — networking, persistence, caching, serialization, migrations, and data-access conventions.
 - `ui.md` — UI implementation rules, accessibility, localization implementation, responsive behavior, platform UI conventions, and requirements for following authoritative design documentation.
@@ -106,7 +106,8 @@ Scan the current working directory. Use `scripts/inspect_project.py` when availa
 Identify:
 
 - repository layout and likely application boundaries;
-- languages, frameworks, manifests, package managers, build systems, linters, formatters, test frameworks, and CI configuration;
+- languages, frameworks, manifests, package managers, build systems, linters, formatters, test frameworks, existing test suites, test commands, and CI configuration;
+- testable behavior surfaces and integration boundaries for each software application, based on the responsibilities and external resources actually present in the repository;
 - existing `AGENTS.md`, `CLAUDE.md`, `.claude/`, standards, and development documentation;
 - whether existing `CLAUDE.md` files already import `@AGENTS.md` or contain user-maintained Claude-specific instructions;
 - authoritative project documentation, specifications, schemas, configuration, design sources, and other sources of truth;
@@ -158,7 +159,9 @@ Every question must be self-contained:
 - show `Options: <values>` for finite-choice decisions when doing so makes the answer clearer or less ambiguous;
 - show `Detected: <value>` when repository evidence helps the user decide;
 - show `Current: <value>` in update mode when an existing decision is explicit;
-- show `Default: <value>` when a default applies;
+- show `Default: <value>` when a safe default applies;
+- show `Required: Yes` when the decision has no safe default and explicit user input is necessary;
+- do not invent a default merely to avoid asking for a material product or engineering-policy decision;
 - in update mode, preserve an explicit valid current value as the default unless the user asks to reconsider it or the value is no longer applicable;
 - if a proposed default differs from an explicit current value, briefly explain why;
 - use the shown default when the user leaves the item unanswered;
@@ -183,8 +186,56 @@ Project Standards Setup
    Default: <same current value unless a change is justified>
 
 Reply with only the items you want to change.
-Unanswered items will use their shown defaults.
+Unanswered items will use their shown defaults. Items marked Required must be answered.
 ```
+
+#### Testing policy decisions
+
+Automated-testing policy is an engineering-policy decision, not a fact that can be inferred from the mere presence or absence of existing tests. Existing test files, frameworks, commands, coverage, and CI are evidence about current tooling and practice, but they define future automated-testing obligations only when an authoritative project rule already makes that intent explicit.
+
+For each software application with testable behavior that does not already have an explicit, unambiguous testing policy:
+
+- derive a compact set of candidate test surfaces from the application's actual responsibilities and integrations rather than from a fixed questionnaire;
+- ask only about surfaces that actually exist or are clearly relevant to the application;
+- group applications or surfaces when the same policy can reasonably apply instead of asking repetitive questions;
+- when several surfaces need decisions, present them as one compact testing-policy item or matrix rather than many unrelated top-level questions;
+- use repository-specific surface names and short explanations so the user can tell what code or behavior each choice governs;
+- define surfaces at meaningful behavior or integration boundaries; do not create a separate policy row for every file, type, component, endpoint, or implementation unit unless the repository explicitly governs testing at that granularity.
+
+Treat the following as separate policy dimensions rather than combining them into one scale:
+
+- **Requirement:** `Required` or `Not required`. This decides whether changes to the surface carry an automated-test obligation.
+- **Depth:** when testing is required, use `Targeted`, `Broad`, or `Custom` unless repository-specific choices are clearer.
+- **Dependency strategy:** only for integration boundaries where the choice materially affects the standard, use `Shared/external real dependency`, `Ephemeral/local real dependency`, `Test double`, `Mixed`, or `Custom` unless repository-specific choices are clearer.
+- **Additional constraints:** ask only when another testing distinction materially affects implementation or maintenance and cannot be inferred reliably.
+
+Interpret the default depth terms consistently:
+
+- `Targeted` — require tests for newly added or materially changed behavior on that surface, regressions fixed by the change, and important failure, boundary, or edge behavior relevant to that change.
+- `Broad` — require tests for the surface's significant supported behavior, including normal paths, important boundaries, failure handling, and applicable integration behavior, not only behavior touched by the current change.
+- `Custom` — follow the explicit scope or depth defined by the user.
+
+When a change affects a surface marked `Required`, add or update automated tests according to that surface's confirmed depth. A surface marked `Not required` has no standing obligation to add or update dedicated automated tests. It does not prohibit adding tests, require removing existing tests, permit configured tests to be skipped, or prevent the surface from being covered by shared or higher-level tests. It also does not disable build, lint, formatting, type-checking, static analysis, packaging, or other validation required elsewhere.
+
+Prefer asking about behavior, boundaries, and dependency realism over asking the user to choose testing taxonomy. Infer suitable unit, component, integration, contract, or end-to-end test types from the confirmed policy, repository architecture, and established tooling. Ask about specific test types only when that distinction itself would materially change implementation or maintenance.
+
+Do not introduce numeric coverage targets, mandatory test types, exhaustive testing requirements, or stronger dependency realism than the confirmed policy requires.
+
+Potential test surfaces include UI or component behavior, domain or business logic, service or API behavior, persistence and data access, external infrastructure or service integrations, background processing, and end-to-end flows. Treat these as discovery examples, not as a required checklist.
+
+When several surfaces require user decisions and text input is used, present them compactly, for example:
+
+```text
+Testing policy
+
+Surface      Requirement                 Depth (if Required)           Dependency strategy (if relevant)
+<surface>    Required / Not required     Targeted / Broad / Custom     <when relevant>
+<surface>    Required / Not required     Targeted / Broad / Custom     <when relevant>
+```
+
+Ask for `Depth` only when `Requirement` is `Required`. Show `Dependency strategy` only for integration boundaries where it is relevant. Mark the testing-policy item `Required: Yes` when no safe default exists.
+
+#### Standard decision categories
 
 Use these standard decision categories only when they are unresolved:
 
@@ -197,15 +248,16 @@ Use these standard decision categories only when they are unresolved:
    - if Claude Code evidence exists but no adapter is active, ask whether to enable it. Options: `Yes` / `No`. Default: `Yes`;
    - otherwise, ask whether to generate Claude Code adapters. Options: `Yes` / `No`. Default: `No`.
 6. Coding-style authority selection. Default to `Automatic` for all applications. When confirmation is needed, ask once at repository level and let the user specify only application-level overrides.
-7. Repository-wide hard constraints or application-specific conventions, only when repository evidence indicates that a material rule exists but its intended policy cannot be determined reliably.
-8. The authoritative project document, only when multiple conflicting candidates exist.
-9. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
+7. Testing policy for each software application with testable behavior, including which detected surfaces are `Required` or `Not required`, the depth for required surfaces, and dependency strategy only where an integration boundary makes it material. Do not infer this policy solely from current test coverage.
+8. Repository-wide hard constraints or application-specific conventions, only when repository evidence indicates that a material rule exists but its intended policy cannot be determined reliably.
+9. The authoritative project document, only when multiple conflicting candidates exist.
+10. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
 
-In create mode, confirm the development-documentation language and Git commit message language unless the user already stated them in the current conversation.
+In create mode, confirm the development-documentation language and Git commit message language unless the user already stated them in the current conversation. For every software application with testable behavior and no authoritative or user-stated testing policy, require an explicit testing-policy decision. Group applications when the same policy clearly applies, and do not silently derive automated-testing obligations from repository conventions.
 
-In update mode, do not re-ask those language decisions when the current values are explicit and unambiguous. Preserve explicit valid existing choices as current defaults unless the user asks to reconsider them or repository changes make them inapplicable. Apply the same rule to all other existing decisions.
+In update mode, do not re-ask those language decisions when the current values are explicit and unambiguous. Preserve explicit valid existing choices as current defaults unless the user asks to reconsider them or repository changes make them inapplicable. Apply the same rule to all other existing decisions. Preserve an explicit testing policy as well, but ask when it is missing, ambiguous, or no longer classifies a materially new application responsibility or integration boundary. Ask only about the uncovered surfaces or dimensions rather than reopening the entire testing policy.
 
-After the user answers, ask at most one focused follow-up batch only when the answers introduce or reveal a new material ambiguity that could not reasonably have been identified before the initial batch. Otherwise, proceed without further setup questions.
+After the user answers, ask at most one focused follow-up batch only when the answers introduce or reveal a new material ambiguity that could not reasonably have been identified before the initial batch. If a required testing-policy field remains unanswered, do not infer or default it; use that focused follow-up only for the missing required decisions and do not proceed until they are resolved. Otherwise, proceed without further setup questions.
 
 Do not ask which language to use for `AGENTS.md` or `<docs-root>/standards/**`; they are always en-US.
 
@@ -238,6 +290,12 @@ Use the bundled files only as technology-neutral templates:
 - `templates/root/CLAUDE.md`
 
 Generate standards only from durable normative requirements supported by enforced project configuration, authoritative documentation, established project conventions, selected style authorities, primary documentation, and user answers. Keep descriptive and source-of-truth project documentation outside the standards tree and reference it when needed.
+
+For software applications, write `testing.md` from the confirmed testing policy rather than extrapolating from the current test suite. For each covered surface, record whether automated testing is `Required` or `Not required`; for required surfaces, record the confirmed depth; record dependency strategy only for integration boundaries where it is part of the policy; and state the change obligation that tells agents when tests must be added or updated. Include established test tooling and test-type conventions only where they help execute the confirmed policy.
+
+Keep automated-testing policy separate from broader validation. Build, lint, formatting, type-checking, static analysis, packaging, and similar checks are governed by repository tooling and development guidelines even when a surface is `Not required` for automated testing.
+
+Preserve deliberate `Not required` decisions when they materially constrain future changes; an explicit policy in which all discovered surfaces are `Not required` is itself substantive when it is intended to prevent agents from introducing automated-test requirements. Do not require tests for every component, layer, service, or code path unless the confirmed policy says so, and do not invent coverage percentages, test taxonomies, dependency realism, or stronger testing obligations than the user selected.
 
 When writing Markdown generated or updated by this skill, do not hard-wrap prose to a fixed column width unless repository-enforced tooling explicitly requires it.
 
@@ -272,6 +330,7 @@ In update mode:
 - normalize application standards to the canonical catalog instead of preserving alternate standards filenames;
 - do not normalize non-standard source-of-truth documents into canonical standards;
 - remove rules that no longer apply to the owning application;
+- preserve explicit `Required` and `Not required` testing classifications, depth, and dependency strategies; when a materially new application responsibility or integration boundary is not covered by the existing testing policy, ask only about the uncovered policy dimensions instead of automatically extending the policy;
 - remove duplicated descriptive project state from standards when an authoritative source already exists elsewhere;
 - if unique descriptive or source-of-truth content exists only inside standards, preserve it outside the standards tree before removing the original; use an existing appropriate documentation location, or `<docs-root>/design/` as the fallback for design documentation, and ask the user when the destination is ambiguous;
 - when moving source-of-truth documentation, preserve its content and update references instead of merging it into a canonical standard;
@@ -311,6 +370,8 @@ Before completion, verify:
 - common standards contain no application-specific requirements unless every application truly shares them;
 - no rule is duplicated in common and application-specific documents without deliberate specialization;
 - standards do not conflict with enforced formatter, linter, build, test, compiler, or code-generation configuration;
+- each software application's `testing.md`, when present, matches the confirmed `Required` and `Not required` surfaces, depth, dependency strategy where relevant, and change obligations, and does not silently strengthen or broaden the testing policy based only on existing tests or tooling;
+- automated-testing policy does not disable or replace independently required build, lint, formatting, type-checking, static-analysis, packaging, or other validation;
 - Markdown generated or updated by this skill is not hard-wrapped to a fixed column width unless enforced repository tooling requires it;
 - documentation-only repositories do not receive unrelated software-specific standards;
 - every `AGENTS.md` and standards file is written in en-US;
@@ -329,5 +390,6 @@ Report concisely:
 - Claude Code support status;
 - files created, updated, moved, or removed;
 - coding-style authorities selected per application;
+- confirmed testing policy per software application, including `Required` and `Not required` surfaces, depth, and dependency strategy where relevant;
 - source-of-truth content moved out of standards or awaiting a user decision;
 - unresolved conflicts or assumptions.
