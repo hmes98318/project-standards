@@ -1,6 +1,6 @@
 {
   "name": "project-standards",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Inspect repositories and create or update durable, application-scoped development standards and agent instruction routing.",
   "author": {
     "name": "hmes98318",
