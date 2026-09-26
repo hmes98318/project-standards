@@ -18,6 +18,7 @@ For application-specific changes, also follow the closest applicable `AGENTS.md`
 
 ## Development Documentation
 
+{{DEVELOPMENT_DOCUMENTATION_CREATION_POLICY}}
 - Store development documentation under `{{DOCS_ROOT}}/`.
 - Review relevant documentation before development.
 - For new features or changes to documented architecture, design, or behavior, update the relevant documentation first, then implement according to it.

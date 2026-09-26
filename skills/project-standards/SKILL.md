@@ -24,6 +24,16 @@ Support single-application repositories, monorepos, and documentation-only repos
 - Project development documentation outside the standards tree defaults to `en-US`.
 - Git commit messages default to `en-US`.
 
+## Development Documentation Creation Policy
+
+Project standards are mandatory. Always create or maintain the applicable `AGENTS.md` files and required files under `<docs-root>/standards/`.
+
+Creation of normal project development documentation outside the standards tree is allowed by default when a change requires new documentation. Only suppress creation of new project development documentation when the user explicitly requests that no new development documentation be created. Do not infer this opt-out from the absence of documentation, repository history, code-only conventions, or missing documentation tooling.
+
+The opt-out controls only the creation of new project development documentation. It does not disable the Development Documentation rules, does not prevent reading or updating existing documentation when those rules require it, and does not permit deleting existing documentation.
+
+The opt-out does not apply to agent-facing project standards or optional thin `CLAUDE.md` adapters. It also does not authorize discarding unique source-of-truth content during standards cleanup. If preserving such content would require creating a new project document, ask the user rather than deleting the content.
+
 ## Output Architecture
 
 Use application scope as the primary boundary for development standards.
@@ -42,7 +52,8 @@ CLAUDE.md                               # optional; imports @AGENTS.md
 
 Rules:
 
-- Root `AGENTS.md` defines repository-wide routing, hard constraints, development-documentation policy, instruction precedence, and commit policy.
+- Project standards are mandatory and cannot be disabled by opting out of the creation of new project development documentation.
+- Root `AGENTS.md` defines repository-wide routing, hard constraints, development-documentation rules and creation policy, instruction precedence, and commit policy.
 - Scoped `<application>/AGENTS.md` files route only the standards applicable to their application.
 - When Claude Code support is enabled, create a `CLAUDE.md` next to each generated `AGENTS.md` that imports the local `@AGENTS.md`.
 - `common/` contains only rules that truly apply across application scopes and technology stacks.
@@ -240,7 +251,7 @@ Ask for `Depth` only when `Requirement` is `Required`. Show `Dependency strategy
 Use these standard decision categories only when they are unresolved:
 
 1. Application scopes and names, only when detected boundaries are ambiguous.
-2. Documentation root. Default: `docs/`.
+2. Documentation root. Default: `docs/`. This remains required because project standards are always stored under `<docs-root>/standards/`.
 3. Language for project development documentation outside `<docs-root>/standards/`. Default: `en-US`.
 4. Git commit message language. Default: `en-US`.
 5. Claude Code support:
@@ -253,9 +264,11 @@ Use these standard decision categories only when they are unresolved:
 9. The authoritative project document, only when multiple conflicting candidates exist.
 10. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
 
-In create mode, confirm the development-documentation language and Git commit message language unless the user already stated them in the current conversation. For every software application with testable behavior and no authoritative or user-stated testing policy, require an explicit testing-policy decision. Group applications when the same policy clearly applies, and do not silently derive automated-testing obligations from repository conventions.
+Do not ask whether creation of new project development documentation should be disabled. New development-documentation creation is allowed by default. Apply the opt-out only when the user explicitly requests it in the current conversation or when update mode finds an explicit existing repository decision.
 
-In update mode, do not re-ask those language decisions when the current values are explicit and unambiguous. Preserve explicit valid existing choices as current defaults unless the user asks to reconsider them or repository changes make them inapplicable. Apply the same rule to all other existing decisions. Preserve an explicit testing policy as well, but ask when it is missing, ambiguous, or no longer classifies a materially new application responsibility or integration boundary. Ask only about the uncovered surfaces or dimensions rather than reopening the entire testing policy.
+In create mode, confirm the development-documentation language and Git commit message language unless the user already stated them in the current conversation. Honor an explicit request not to create new project development documentation without weakening or removing the Development Documentation rules. For every software application with testable behavior and no authoritative or user-stated testing policy, require an explicit testing-policy decision. Group applications when the same policy clearly applies, and do not silently derive automated-testing obligations from repository conventions.
+
+In update mode, preserve an explicit opt-out from creating new project development documentation. If no explicit opt-out exists, allow new development-documentation creation when otherwise required; absence of documentation is not an opt-out. Do not re-ask the development-documentation language or Git commit message language when the current values are explicit and unambiguous. Preserve explicit valid existing choices as current defaults unless the user asks to reconsider them or repository changes make them inapplicable. Apply the same rule to all other existing decisions. Preserve an explicit testing policy as well, but ask when it is missing, ambiguous, or no longer classifies a materially new application responsibility or integration boundary. Ask only about the uncovered surfaces or dimensions rather than reopening the entire testing policy.
 
 After the user answers, ask at most one focused follow-up batch only when the answers introduce or reveal a new material ambiguity that could not reasonably have been identified before the initial batch. If a required testing-policy field remains unanswered, do not infer or default it; use that focused follow-up only for the missing required decisions and do not proceed until they are resolved. Otherwise, proceed without further setup questions.
 
@@ -282,6 +295,8 @@ Always create or maintain:
 - `<docs-root>/standards/common/development-guidelines.md`;
 - application-specific standards selected only from the canonical catalog and only when they contain substantive rules.
 
+These project-standards outputs are mandatory. Do not omit them because the user has opted out of creating new project development documentation.
+
 Use the bundled files only as technology-neutral templates:
 
 - `templates/common/development-guidelines.md`
@@ -289,7 +304,18 @@ Use the bundled files only as technology-neutral templates:
 - `templates/root/scoped-AGENTS.md`
 - `templates/root/CLAUDE.md`
 
+The root `AGENTS.md` must always keep the bundled Development Documentation rules unchanged. They define how project development documentation is located, reviewed, updated, kept consistent, and written when it exists.
+
+Use `{{DEVELOPMENT_DOCUMENTATION_CREATION_POLICY}}` only for an explicit opt-out from creating new project development documentation:
+
+- if the user has explicitly requested that no new project development documentation be created, replace the placeholder with `- Do not create new project development documentation unless the current task explicitly requires it.`;
+- otherwise, remove the placeholder without adding a rule.
+
+The creation opt-out does not remove, replace, weaken, or condition the fixed Development Documentation rules, including the selected development-documentation language requirement. Existing project development documentation must still be read and updated when those rules require it.
+
 Generate standards only from durable normative requirements supported by enforced project configuration, authoritative documentation, established project conventions, selected style authorities, primary documentation, and user answers. Keep descriptive and source-of-truth project documentation outside the standards tree and reference it when needed.
+
+Create new project development documentation when relevant by default. If the user has explicitly opted out of new development-documentation creation, do not create new project development documentation unless the current task explicitly requires it. This opt-out does not change the obligation to read or update existing project development documentation under the fixed Development Documentation rules.
 
 For software applications, write `testing.md` from the confirmed testing policy rather than extrapolating from the current test suite. For each covered surface, record whether automated testing is `Required` or `Not required`; for required surfaces, record the confirmed depth; record dependency strategy only for integration boundaries where it is part of the policy; and state the change obligation that tells agents when tests must be added or updated. Include established test tooling and test-type conventions only where they help execute the confirmed policy.
 
@@ -326,13 +352,15 @@ In update mode:
 
 - read every affected standards, routing, and source-of-truth document before editing;
 - preserve valid user-authored normative rules and project-specific decisions;
+- preserve an explicit opt-out from creating new project development documentation; if no explicit opt-out exists, do not infer one from missing or sparse documentation;
 - update routing when applications are added, removed, renamed, or moved;
 - normalize application standards to the canonical catalog instead of preserving alternate standards filenames;
 - do not normalize non-standard source-of-truth documents into canonical standards;
 - remove rules that no longer apply to the owning application;
 - preserve explicit `Required` and `Not required` testing classifications, depth, and dependency strategies; when a materially new application responsibility or integration boundary is not covered by the existing testing policy, ask only about the uncovered policy dimensions instead of automatically extending the policy;
 - remove duplicated descriptive project state from standards when an authoritative source already exists elsewhere;
-- if unique descriptive or source-of-truth content exists only inside standards, preserve it outside the standards tree before removing the original; use an existing appropriate documentation location, or `<docs-root>/design/` as the fallback for design documentation, and ask the user when the destination is ambiguous;
+- when the user has opted out of creating new project development documentation, do not create new project development documentation as part of ordinary implementation work; continue to read and update existing project development documentation according to the fixed Development Documentation rules;
+- if unique descriptive or source-of-truth content exists only inside standards, preserve it outside the standards tree before removing the original; use an existing appropriate documentation location, or `<docs-root>/design/` as the fallback for design documentation, and ask the user when the destination is ambiguous. When creating new project development documentation has been opted out, ask before creating a new document to preserve such content rather than discarding it;
 - when moving source-of-truth documentation, preserve its content and update references instead of merging it into a canonical standard;
 - never propagate one application's rules into another application;
 - consolidate duplicated rules into the narrowest correct shared location;
@@ -352,12 +380,13 @@ When no software application is present and the repository is primarily document
 - keep descriptive and source-of-truth documentation outside the standards tree;
 - do not invent software-specific standards unrelated to the repository.
 
-The user-selected development-documentation language still applies to normal project documentation. `AGENTS.md` and `<docs-root>/standards/**` remain en-US.
+The selected development-documentation language applies to project development documentation whenever it is created or updated. `AGENTS.md` and `<docs-root>/standards/**` remain mandatory and en-US regardless of any opt-out from creating new project development documentation.
 
 ### 9. Validate the generated architecture
 
 Before completion, verify:
 
+- root `AGENTS.md` and the required project standards exist regardless of any opt-out from creating new project development documentation;
 - every referenced file exists;
 - every application standards filename belongs to the canonical catalog unless the user explicitly extended it;
 - every scoped `AGENTS.md` routes only standards relevant to that application;
@@ -375,7 +404,9 @@ Before completion, verify:
 - Markdown generated or updated by this skill is not hard-wrapped to a fixed column width unless enforced repository tooling requires it;
 - documentation-only repositories do not receive unrelated software-specific standards;
 - every `AGENTS.md` and standards file is written in en-US;
-- development-documentation and commit-message language rules match the user's selected values;
+- creation of new project development documentation is allowed by default and suppressed only by an explicit user opt-out; the opt-out never disables project standards or the Development Documentation rules;
+- when the user has opted out of creating new project development documentation, no new project development documentation is created unless explicitly required, existing project development documentation still follows the fixed Development Documentation rules, and no unique source-of-truth content is discarded;
+- development-documentation language and commit-message language rules match the user's selected values;
 - the final diff is focused and does not modify application source code unless the user explicitly requested it.
 
 ## Completion Report
@@ -385,6 +416,7 @@ Report concisely:
 - create or update mode;
 - detected and confirmed application scopes and stacks;
 - documentation root;
+- whether the user explicitly opted out of creating new project development documentation;
 - development-documentation language;
 - Git commit message language;
 - Claude Code support status;

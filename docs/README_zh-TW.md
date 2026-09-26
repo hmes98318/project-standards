@@ -102,9 +102,11 @@ Root `AGENTS.md` 保存 repository-wide instructions、hard constraints、preced
 
 ## 預設行為
 
-`AGENTS.md` 與 development standards 固定使用 `en-US`，確保 agent-facing instructions 一致。
+`AGENTS.md` 與 development standards 為強制產物，並固定使用 `en-US`，確保 agent-facing instructions 一致。
 
-Project development documentation 與 Git commit message 的語言則由使用者選擇，預設為 `en-US`。
+一般 project development documentation 預設可在需要時建立。使用者可以明確要求不要建立新的開發文檔；這個選擇不會停用既有文件適用的 Development Documentation 規則，也不會停用 Project Standards 本身。Development documentation 的語言由使用者選擇，預設為 `en-US`。
+
+Git commit message 的語言由使用者選擇，預設為 `en-US`。
 
 Coding style 預設自動依 repository evidence 與 primary documentation 選擇，也可以針對特定 application 覆寫。
 
