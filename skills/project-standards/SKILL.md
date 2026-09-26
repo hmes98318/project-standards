@@ -56,7 +56,8 @@ Rules:
 - Root `AGENTS.md` defines repository-wide routing, hard constraints, development-documentation rules and creation policy, instruction precedence, and commit policy.
 - Scoped `<application>/AGENTS.md` files route only the standards applicable to their application.
 - When Claude Code support is enabled, create a `CLAUDE.md` next to each generated `AGENTS.md` that imports the local `@AGENTS.md`.
-- `common/` contains only rules that truly apply across application scopes and technology stacks.
+- `<docs-root>/standards/common/development-guidelines.md` is the fixed repository-wide engineering baseline and must exactly mirror `templates/common/development-guidelines.md`.
+- `common/` contains only rules that truly apply across application scopes and technology stacks. Do not merge project-specific additions into the fixed `development-guidelines.md` baseline.
 - Language-, framework-, platform-, and tool-specific rules belong to the owning application scope.
 - Match a standards directory name to its application directory name when practical.
 - Create only the application scopes and standards required by the repository and current requirements.
@@ -297,9 +298,10 @@ Always create or maintain:
 
 These project-standards outputs are mandatory. Do not omit them because the user has opted out of creating new project development documentation.
 
-Use the bundled files only as technology-neutral templates:
+`templates/common/development-guidelines.md` is canonical fixed content for `<docs-root>/standards/common/development-guidelines.md`. When creating or updating the target file, copy the bundled file verbatim. Do not summarize, rewrite, omit, reorder, adapt, or merge project-specific rules into it based on repository evidence, user answers, existing conventions, or model judgment. If the target file differs from the bundled canonical content, replace it with the bundled content exactly.
 
-- `templates/common/development-guidelines.md`
+Use the remaining bundled files as structural templates:
+
 - `templates/root/AGENTS.md`
 - `templates/root/scoped-AGENTS.md`
 - `templates/root/CLAUDE.md`
@@ -313,7 +315,7 @@ Use `{{DEVELOPMENT_DOCUMENTATION_CREATION_POLICY}}` only for an explicit opt-out
 
 The creation opt-out does not remove, replace, weaken, or condition the fixed Development Documentation rules, including the selected development-documentation language requirement. Existing project development documentation must still be read and updated when those rules require it.
 
-Generate standards only from durable normative requirements supported by enforced project configuration, authoritative documentation, established project conventions, selected style authorities, primary documentation, and user answers. Keep descriptive and source-of-truth project documentation outside the standards tree and reference it when needed.
+Generate application-specific standards only from durable normative requirements supported by enforced project configuration, authoritative documentation, established project conventions, selected style authorities, primary documentation, and user answers. Keep descriptive and source-of-truth project documentation outside the standards tree and reference it when needed. Do not use this generation logic to modify the fixed common development-guidelines baseline.
 
 Create new project development documentation when relevant by default. If the user has explicitly opted out of new development-documentation creation, do not create new project development documentation unless the current task explicitly requires it. This opt-out does not change the obligation to read or update existing project development documentation under the fixed Development Documentation rules.
 
@@ -325,7 +327,7 @@ Preserve deliberate `Not required` decisions when they materially constrain futu
 
 When writing Markdown generated or updated by this skill, do not hard-wrap prose to a fixed column width unless repository-enforced tooling explicitly requires it.
 
-This skill must not carry prewritten standards for a specific language, framework, platform, product domain, or project type.
+This skill must not carry prewritten standards for a specific language, framework, platform, product domain, or project type beyond the fixed technology-neutral common development-guidelines baseline bundled with this skill.
 
 ### 6. Generate application-scoped routing
 
@@ -351,11 +353,13 @@ When Claude Code support is enabled:
 In update mode:
 
 - read every affected standards, routing, and source-of-truth document before editing;
-- preserve valid user-authored normative rules and project-specific decisions;
+- preserve valid user-authored normative rules and project-specific decisions, except that `<docs-root>/standards/common/development-guidelines.md` must always be synchronized to the bundled canonical content exactly;
 - preserve an explicit opt-out from creating new project development documentation; if no explicit opt-out exists, do not infer one from missing or sparse documentation;
 - update routing when applications are added, removed, renamed, or moved;
 - normalize application standards to the canonical catalog instead of preserving alternate standards filenames;
 - do not normalize non-standard source-of-truth documents into canonical standards;
+- replace `<docs-root>/standards/common/development-guidelines.md` with `templates/common/development-guidelines.md` whenever their contents differ; do not preserve local additions, omissions, rewrites, or formatting changes in this fixed baseline;
+- place project-specific rules in the narrowest appropriate non-baseline location instead of adding them to the fixed common development-guidelines file;
 - remove rules that no longer apply to the owning application;
 - preserve explicit `Required` and `Not required` testing classifications, depth, and dependency strategies; when a materially new application responsibility or integration boundary is not covered by the existing testing policy, ask only about the uncovered policy dimensions instead of automatically extending the policy;
 - remove duplicated descriptive project state from standards when an authoritative source already exists elsewhere;
@@ -363,9 +367,9 @@ In update mode:
 - if unique descriptive or source-of-truth content exists only inside standards, preserve it outside the standards tree before removing the original; use an existing appropriate documentation location, or `<docs-root>/design/` as the fallback for design documentation, and ask the user when the destination is ambiguous. When creating new project development documentation has been opted out, ask before creating a new document to preserve such content rather than discarding it;
 - when moving source-of-truth documentation, preserve its content and update references instead of merging it into a canonical standard;
 - never propagate one application's rules into another application;
-- consolidate duplicated rules into the narrowest correct shared location;
-- do not rewrite unchanged documents merely to match templates;
-- do not replace user customizations with generated defaults unless the user explicitly requests it.
+- consolidate duplicated rules into the narrowest correct shared location, except do not merge project-specific rules into the fixed common development-guidelines baseline;
+- do not rewrite unchanged documents merely to match templates, except for the fixed common development-guidelines file, which must always match its bundled canonical content;
+- do not replace user customizations with generated defaults unless the user explicitly requests it, except for the fixed common development-guidelines file.
 
 If a rule appears common only because multiple applications currently use the same implementation, keep it application-scoped unless it is truly repository-wide.
 
@@ -387,6 +391,8 @@ The selected development-documentation language applies to project development d
 Before completion, verify:
 
 - root `AGENTS.md` and the required project standards exist regardless of any opt-out from creating new project development documentation;
+- `<docs-root>/standards/common/development-guidelines.md` exists and its content exactly matches `templates/common/development-guidelines.md`;
+- no project-specific rules or repository-derived modifications have been merged into the fixed common development-guidelines baseline;
 - every referenced file exists;
 - every application standards filename belongs to the canonical catalog unless the user explicitly extended it;
 - every scoped `AGENTS.md` routes only standards relevant to that application;
