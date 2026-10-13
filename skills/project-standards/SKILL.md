@@ -205,6 +205,21 @@ Reply with only the items you want to change.
 Unanswered items will use their shown defaults. Items marked Required must be answered.
 ```
 
+#### Code-comment policy
+
+Apply this policy only to software application source code. Exclude development documentation and documentation-only repositories. Existing comment volume or generic "explain why" advice does not establish an explicit policy.
+
+- `Full` — Document module responsibilities and relationships, important types, public interfaces, and nontrivial functions, including private helpers. Explain purpose and relevant inputs, outputs, side effects, and failures; explain business rules, edge cases, design decisions, and complex flows beside the implementation.
+- `Concise` — Briefly document public entry-point purposes and relevant contracts; explain non-obvious rules locally. Add internal explanations where intent or behavior remains unclear.
+- `None` — Add no optional explanatory comments or docstrings; maintain existing comments.
+- `Custom` — Use the user's explicit coverage, detail, and exceptions.
+
+Write the selected policy's name, concrete requirements, and the shared rules below in the application's `coding-style.md`. Route that standard through the applicable `AGENTS.md` as mandatory for source changes.
+
+- Apply coverage to new or materially changed units and fill missing required explanations within those units.
+- Use native documentation-comment syntax for contracts and nearby inline comments for implementation reasoning.
+- Exclude generated and vendored code from manual additions. Meet license and tooling requirements for comments under every policy, including adding required notices, directives, or documentation comments.
+
 #### Testing policy decisions
 
 Automated-testing policy is an engineering-policy decision, not a fact that can be inferred from the mere presence or absence of existing tests. Existing test files, frameworks, commands, coverage, and CI are evidence about current tooling and practice, but they define future automated-testing obligations only when an authoritative project rule already makes that intent explicit.
@@ -264,10 +279,11 @@ Use these standard decision categories only when they are unresolved:
    - if Claude Code evidence exists but no adapter is active, ask whether to enable it. Options: `Yes` / `No`. Default: `Yes`;
    - otherwise, ask whether to generate Claude Code adapters. Options: `Yes` / `No`. Default: `No`.
 6. Coding-style authority selection. Default to `Automatic` for all applications. When confirmation is needed, ask once at repository level and let the user specify only application-level overrides.
-7. Testing policy for each software application with testable behavior, including which detected surfaces are `Required` or `Not required`, the depth for required surfaces, and dependency strategy only where an integration boundary makes it material. Do not infer this policy solely from current test coverage.
-8. Repository-wide hard constraints or application-specific conventions, only when repository evidence indicates that a material rule exists but its intended policy cannot be determined reliably.
-9. The authoritative project document, only when multiple conflicting candidates exist.
-10. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
+7. Code-comment policy for software applications. Ask when missing, ambiguous, or the user requests reconsideration. Options: `Full` / `Concise` / `None` / `Custom`. Default: the current explicit policy, otherwise `Full`. Use a shared policy with application overrides.
+8. Testing policy for each software application with testable behavior, including which detected surfaces are `Required` or `Not required`, the depth for required surfaces, and dependency strategy only where an integration boundary makes it material. Do not infer this policy solely from current test coverage.
+9. Repository-wide hard constraints or application-specific conventions, only when repository evidence indicates that a material rule exists but its intended policy cannot be determined reliably.
+10. The authoritative project document, only when multiple conflicting candidates exist.
+11. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
 
 Do not ask whether creation of new project development documentation should be disabled. New development-documentation creation is allowed by default. Apply the opt-out only when the user explicitly requests it in the current conversation or when update mode finds an explicit existing repository decision.
 
@@ -275,7 +291,7 @@ In create mode, confirm the development-documentation language and Git commit me
 
 In update mode, preserve an explicit opt-out from creating new project development documentation. If no explicit opt-out exists, allow new development-documentation creation when otherwise required; absence of documentation is not an opt-out. Do not re-ask the development-documentation language or Git commit message language when the current values are explicit and unambiguous. Preserve explicit valid existing choices as current defaults unless the user asks to reconsider them or repository changes make them inapplicable. Apply the same rule to all other existing decisions. Preserve an explicit testing policy as well, but ask when it is missing, ambiguous, or no longer classifies a materially new application responsibility or integration boundary. Ask only about the uncovered surfaces or dimensions rather than reopening the entire testing policy.
 
-After the user answers, ask at most one focused follow-up batch only when the answers introduce or reveal a new material ambiguity that could not reasonably have been identified before the initial batch. If a required testing-policy field remains unanswered, do not infer or default it; use that focused follow-up only for the missing required decisions and do not proceed until they are resolved. Otherwise, proceed without further setup questions.
+After the user answers, ask at most one focused follow-up batch for newly revealed material ambiguity or missing required policy details. Resolve required testing-policy fields and any unspecified `Custom` comment requirements before proceeding; do not infer or default them. Otherwise, proceed without further setup questions.
 
 Do not ask which language to use for `AGENTS.md` or `<docs-root>/standards/**`; they are always en-US.
 
@@ -409,6 +425,7 @@ Before completion, verify:
 - common standards contain no application-specific requirements unless every application truly shares them;
 - no rule is duplicated in common and application-specific documents without deliberate specialization;
 - standards do not conflict with enforced formatter, linter, build, test, compiler, or code-generation configuration;
+- each software application has the selected policy's concrete coverage and exceptions in its standards, with mandatory routing for source changes;
 - each software application's `testing.md`, when present, matches the confirmed `Required` and `Not required` surfaces, depth, dependency strategy where relevant, and change obligations, and does not silently strengthen or broaden the testing policy based only on existing tests or tooling;
 - automated-testing policy does not disable or replace independently required build, lint, formatting, type-checking, static-analysis, packaging, or other validation;
 - Markdown generated or updated by this skill is not hard-wrapped to a fixed column width unless enforced repository tooling requires it;
@@ -431,7 +448,7 @@ Report concisely:
 - Git commit message language;
 - Claude Code support status;
 - files created, updated, moved, or removed;
-- coding-style authorities selected per application;
+- selected coding-style authorities and, for software applications, code-comment policies;
 - confirmed testing policy per software application, including `Required` and `Not required` surfaces, depth, and dependency strategy where relevant;
 - source-of-truth content moved out of standards or awaiting a user decision;
 - unresolved conflicts or assumptions.

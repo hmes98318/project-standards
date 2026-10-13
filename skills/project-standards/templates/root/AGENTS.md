@@ -35,7 +35,7 @@ If any step fails, report the blocker and leave documentation edits pending.
 - Review relevant documentation before development.
 - For new features or changes to documented architecture, design, or behavior, update the relevant documentation first, then implement according to it.
 - Prefer updating existing documentation over creating duplicate or conflicting documents.
-- Keep documentation consistent with the current implementation, concise, and focused on information needed for development and maintenance.
+- Keep documentation concise and consistent with implementation; explain the project without requiring readers to inspect source code.
 - Write project development documentation in `{{DEVELOPMENT_DOCUMENTATION_LANGUAGE}}`.
 - Keep all `AGENTS.md` files and files under `{{STANDARDS_ROOT}}/` in en-US.
 

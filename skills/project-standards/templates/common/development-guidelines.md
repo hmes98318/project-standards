@@ -14,6 +14,25 @@ Use these guidelines for every change.
 - Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
 - Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
 
+## Code quality
+
+### Readability
+
+- Prioritize human readability over code compactness.
+- Separate functions, classes, and distinct logical sections with appropriate blank lines.
+- Break down dense expressions when meaningful intermediate variables improve clarity.
+
+### Comments
+
+- Apply the selected comment policy to software application code. Keep required explanations in the code; development documentation cannot replace them.
+- Explain purpose, contracts, and non-obvious reasoning as required by the policy. Skip redundant narration of trivial code without omitting required explanations of contracts or business rules.
+- Keep comments accurate when behavior changes.
+
+### Consistency
+
+- Follow repository conventions and enforced formatter settings.
+- Preserve behavior and public interfaces outside the intended change; avoid unrelated refactoring.
+
 ## Required workflow
 
 1. Read the task and identify the related source code, tests, documentation, public API, and configuration. Search the repository rather than relying on assumptions.
@@ -26,10 +45,10 @@ Use these guidelines for every change.
 
 - Inspect relevant project documentation and code before selecting an approach.
 - Use web research when project context, upstream behavior, security guidance, or dependency capabilities require verification. Prefer primary documentation.
-- Record non-obvious decisions close to the code or in the relevant project documentation. Do not add comments that merely restate the code.
 
 ## Validation
 
+- Where a code-comment policy applies, review changed source against its requirements and exceptions without relying on development documentation.
 - Run the configured lint, formatting, static analysis, and other code-quality checks relevant to the changed files.
 - Run the configured build, compile, type-check, or packaging commands as applicable to validate that the project produces its expected outputs successfully.
 - Run the relevant tests for the changed behavior. Run the full configured test suite when the changes affect shared, cross-cutting, or broadly used behavior.

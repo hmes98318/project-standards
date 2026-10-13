@@ -114,10 +114,12 @@ Git commit message 的語言由使用者選擇，預設為 `en-US`。
 
 Coding style 預設自動依 repository evidence 與 primary documentation 選擇，也可以針對特定 application 覆寫。
 
+[程式碼註解策略](../skills/project-standards/SKILL.md#code-comment-policy)僅適用於軟體 application 的程式碼，可選擇 `Full`（完整，預設）、`Concise`（精簡）、`None`（不新增非必要說明註解）或 `Custom`（自訂）。開發文檔與必要的 code 註解各自提供足夠說明，不能互相取代。
+
 ## Agent Skills
 
 `project-standards` 採用 [Agent Skills](https://agentskills.io/) 格式，可由支援 `SKILL.md` 的 coding agents 載入與使用。
 
 ## License
 
-[MIT](./LICENSE) License。
+[MIT](../LICENSE) License。

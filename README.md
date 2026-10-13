@@ -114,6 +114,8 @@ Git commit message language is user-selectable and defaults to `en-US`.
 
 Coding style is selected automatically by default based on repository evidence and primary documentation, and it can be overridden for a specific application.
 
+[Code-comment policy](skills/project-standards/SKILL.md#code-comment-policy) applies only to software application code, with options `Full` (default), `Concise`, `None` (no new optional explanatory comments), or `Custom`. Development documentation and required code comments must each provide their own explanations.
+
 ## Agent Skills
 
 `project-standards` uses the [Agent Skills](https://agentskills.io/) format and can be loaded by coding agents that support `SKILL.md`.
