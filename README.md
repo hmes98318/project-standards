@@ -85,6 +85,10 @@ The root `AGENTS.md` contains repository-wide instructions, hard constraints, pr
 
 This gives agents the correct standards without allowing root instructions to grow into a large monolithic document as the project evolves.
 
+### Documentation edits require the latest stable skill
+
+Generated root `AGENTS.md` files require agents to compare the installed `metadata.version` with the latest Release version before documentation edits. Agents automatically install or update the complete skill from that release tag when needed, then read and apply `SKILL.md`. If any step fails, documentation edits remain pending.
+
 ### Updates preserve valid decisions first
 
 If a repository already has standards or agent instructions, `project-standards` first understands the existing content before updating it.

@@ -85,6 +85,10 @@ Root `AGENTS.md` 保存 repository-wide instructions、hard constraints、preced
 
 這讓 agent 可以取得正確的規範，同時避免 root instructions 隨著專案成長變成龐大的單一文件。
 
+### 修改文件前必須確認 Skill 為最新穩定版
+
+產生的 root `AGENTS.md` 會要求 agent 在修改文件前，比對已安裝的 `metadata.version` 與最新 Release version。必要時由 agent 從對應 release tag 自動安裝或更新完整 Skill，再讀取並套用 `SKILL.md`。任何步驟失敗時，文件修改保持待處理。
+
 ### Update 優先保留有效決策
 
 如果 repository 已經有 standards 或 agent instructions，`project-standards` 會先理解現有內容，再進行更新。

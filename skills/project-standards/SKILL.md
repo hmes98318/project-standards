@@ -113,6 +113,8 @@ Rules:
 
 ## Workflow
 
+Before editing documentation, follow the Documentation Skill Prerequisite in `templates/root/AGENTS.md`. For ordinary documentation edits, apply existing project rules; use the workflow below only to create or update project standards and agent routing.
+
 ### 1. Inspect the repository
 
 Scan the current working directory. Use `scripts/inspect_project.py` when available, then inspect relevant files directly.
@@ -308,7 +310,7 @@ Use the remaining bundled files as structural templates:
 - `templates/root/scoped-AGENTS.md`
 - `templates/root/CLAUDE.md`
 
-The root `AGENTS.md` must always keep the bundled Development Documentation rules unchanged. They define how project development documentation is located, reviewed, updated, kept consistent, and written when it exists.
+In both create and update mode, root `AGENTS.md` must include the Documentation Skill Prerequisite and Development Documentation sections from `templates/root/AGENTS.md` unchanged after resolving placeholders.
 
 Use `{{DEVELOPMENT_DOCUMENTATION_CREATION_POLICY}}` only for an explicit opt-out from creating new project development documentation:
 
