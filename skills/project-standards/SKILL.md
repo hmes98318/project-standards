@@ -1,6 +1,8 @@
 ---
 name: project-standards
 description: Inspect a repository and create or update durable, application-scoped development standards and agent instruction routing based on its project structure and user preferences.
+metadata:
+  version: "0.3.0"
 ---
 
 # Project Standards
