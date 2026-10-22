@@ -87,7 +87,7 @@ This gives agents the correct standards without allowing root instructions to gr
 
 ### Documentation edits require the latest stable skill
 
-Generated root `AGENTS.md` files require agents to compare the installed `metadata.version` with the latest Release version before documentation edits. Agents automatically install or update the complete skill from that release tag when needed, then read and apply `SKILL.md`. If any step fails, documentation edits remain pending.
+Generated root `AGENTS.md` files require agents to fetch the [latest release version file (`version.txt`)](https://github.com/hmes98318/project-standards/releases/latest/download/version.txt) and compare its value with the installed `metadata.version` before documentation edits. Agents automatically install or update the complete skill from that release when needed, then read and apply `SKILL.md`. If any step fails, documentation edits remain pending.
 
 ### Updates preserve valid decisions first
 

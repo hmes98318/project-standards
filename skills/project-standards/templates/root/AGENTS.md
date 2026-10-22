@@ -22,8 +22,8 @@ Use [project-standards](https://github.com/hmes98318/project-standards) for deve
 
 Before the first documentation edit in each task, including `AGENTS.md` and `{{STANDARDS_ROOT}}/`:
 
-1. Compare the installed `SKILL.md`'s `metadata.version` with the [latest Release version](https://github.com/hmes98318/project-standards/releases/latest) tag, ignoring its leading `v`.
-2. If the skill or version is missing, or the versions differ, automatically install or update `skills/project-standards/` from that release tag, including templates and scripts.
+1. Fetch the [latest release version file (`version.txt`)](https://github.com/hmes98318/project-standards/releases/latest/download/version.txt) and compare its value with the installed `SKILL.md`'s `metadata.version`, trimming whitespace.
+2. If the skill or version is missing, or the versions differ, automatically install or update `skills/project-standards/` from the latest stable release, including templates and scripts.
 3. Confirm the installed version matches, then read and apply `SKILL.md`.
 
 If any step fails, report the blocker and leave documentation edits pending.

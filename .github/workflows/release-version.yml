@@ -1,0 +1,21 @@
+name: Release Version
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          printf '%s' "${TAG#v}" > version.txt
+          gh release upload "$TAG" version.txt --clobber
