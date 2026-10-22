@@ -12,10 +12,37 @@ jobs:
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout release
+        uses: actions/checkout@v4
+
       - name: Upload version
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           TAG: ${{ github.event.release.tag_name }}
         run: |
-          printf '%s' "${TAG#v}" > version.txt
+          if [[ "$TAG" != v* ]]; then
+            echo "Release tag must start with v: $TAG" >&2
+            exit 1
+          fi
+
+          VERSION="${TAG#v}"
+          SEMVER_REGEX='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*)?(\+[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+          if [[ ! "$VERSION" =~ $SEMVER_REGEX ]]; then
+            echo "Release tag without its v prefix must be a valid Semantic Version: $TAG" >&2
+            exit 1
+          fi
+
+          SKILL_VERSION="$(sed -n 's/^  version: "\(.*\)"$/\1/p' skills/project-standards/SKILL.md)"
+          if [[ -z "$SKILL_VERSION" ]]; then
+            echo "Unable to read metadata.version from SKILL.md" >&2
+            exit 1
+          fi
+
+          if [[ "$VERSION" != "$SKILL_VERSION" ]]; then
+            echo "Release version $VERSION does not match SKILL.md version $SKILL_VERSION" >&2
+            exit 1
+          fi
+
+          printf '%s' "$VERSION" > version.txt
           gh release upload "$TAG" version.txt --clobber
