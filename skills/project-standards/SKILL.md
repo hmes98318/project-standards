@@ -343,7 +343,7 @@ Use the remaining bundled files as structural templates:
 - `templates/root/scoped-AGENTS.md`
 - `templates/root/CLAUDE.md`
 
-In both create and update mode, root `AGENTS.md` must include the Documentation Skill Prerequisite and Development Documentation sections from `templates/root/AGENTS.md` unchanged after resolving placeholders. In update mode, this replaces older wording of the Prerequisite, including the earlier `version.txt` comparison steps.
+In both create and update mode, root `AGENTS.md` must include the Documentation Skill Prerequisite, Development Documentation, and Commits sections from `templates/root/AGENTS.md` unchanged after resolving placeholders. In update mode, replace any older wording of these sections with the template's, even when the rest of the file needs no change.
 
 Resolve `{{SKILL_VERSION}}` to the installed `metadata.version`, producing `<!-- project-standards: X.Y.Z -->` near the top of root `AGENTS.md`. In update mode, refresh the stamp only after the standards match the installed version.
 
@@ -431,7 +431,7 @@ Before completion, verify:
 
 - root `AGENTS.md` and the required project standards exist regardless of any opt-out from creating new project development documentation;
 - `<docs-root>/standards/common/development-guidelines.md` exists and its content exactly matches `templates/common/development-guidelines.md`;
-- root `AGENTS.md` has the template's Documentation Skill Prerequisite and a version stamp equal to the installed skill version;
+- root `AGENTS.md` has the template's Documentation Skill Prerequisite, Development Documentation, and Commits sections and a version stamp equal to the installed skill version;
 - no project-specific rules or repository-derived modifications have been merged into the fixed common development-guidelines baseline;
 - every referenced file exists;
 - every application standards filename belongs to the canonical catalog unless the user explicitly extended it;
