@@ -56,6 +56,7 @@ Application standards use fixed filenames, and a file is created only when it ha
 
 - **Application scope is the boundary.** Language-, framework-, and tooling-specific rules belong to the application that owns them, so applications in a monorepo do not leak rules into each other.
 - **Standards hold durable rules, not project state.** Current architecture, module layout, deployment state, and design specifications stay in their own source-of-truth documents. Standards reference them instead of copying them.
+- **Development documentation explains the system as it is.** Generated `AGENTS.md` rules direct agents to keep documentation a coherent technical explanation of the current design, revised in place instead of appended with change records.
 - **`AGENTS.md` routes; standards carry the detail.** Root instructions stay short as the project grows.
 - **Existing tooling wins.** Enforced formatter, linter, and compiler configuration comes first. Without one, the skill follows framework guidance, then the Google Style Guide, then the official language style guide.
 - **Updates preserve valid decisions.** In a repository that already has standards, the skill re-scans, keeps valid user-written rules, and does not assume existing files came from this skill or rewrite documents that need no change.

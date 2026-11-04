@@ -56,6 +56,7 @@ Application standards 使用固定檔名，且只有在有實質規則時才會�
 
 - **Application scope 是邊界。** Language、framework 與 tooling 相關規則屬於實際擁有它們的 application，monorepo 中的 application 不會互相污染規則。
 - **Standards 只保存長期有效的規則，不記錄專案現況。** 目前的 architecture、module layout、deployment state 與 design specification 留在各自的 source-of-truth 文件中，standards 只引用、不複製。
+- **開發文檔說明系統的當前狀態。** 產生的 `AGENTS.md` 規則要求 agent 將文檔維護為對現行設計的完整技術說明，就地整合修訂，而不是持續追加修改記錄。
 - **`AGENTS.md` 負責 routing，standards 承載細節。** Root 指引不會隨專案成長而變得龐大。
 - **既有 tooling 優先。** 先遵循 repository 已強制執行的 formatter、linter 與 compiler 設定；沒有時，依序採用 framework guidance、Google Style Guide、官方 language style guide。
 - **Update 優先保留有效決策。** Repository 已有 standards 時，Skill 會重新掃描、保留有效的 user-authored 規則，不假設既有檔案由本 Skill 產生，也不改寫不需要變更的文件。
