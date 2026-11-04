@@ -2,24 +2,15 @@
 
 **English** · [繁體中文](docs/README_zh-TW.md)
 
-Build and continuously maintain durable development standards for coding agents based on the repository's actual structure, tech stack, and existing conventions.
-
-`project-standards` is an Agent Skill. It inspects the project first, then determines which rules should apply repository-wide and which should belong to a specific application. It uses `AGENTS.md` as the agent instruction and routing layer, while keeping detailed, long-lived rules in development standards.
-
-It is not a fixed set of templates, and it does not copy the project's current state directly into standards. Generated content is based on the actual tooling, project documentation, coding-style authority, and user decisions.
+`project-standards` is an [Agent Skill](https://agentskills.io/) for creating and managing a project's development standards and guidelines.
 
 ## Installation
 
-### Codex
-
-Using the native Codex Plugin installation flow is recommended:
+### Skills CLI (`npx skills`)
 
 ```bash
-codex plugin marketplace add hmes98318/project-standards
-codex plugin add project-standards@project-standards
+npx skills@latest add hmes98318/project-standards
 ```
-
-The `project-standards` Skill can then be used in Codex.
 
 ### Claude Code
 
@@ -28,97 +19,68 @@ The `project-standards` Skill can then be used in Codex.
 /plugin install project-standards@project-standards
 ```
 
-### Other Agent Skills-compatible tools
-
-For other coding agents that support Agent Skills, install it with the Skills installer:
+### Codex
 
 ```bash
-npx skills@latest add hmes98318/project-standards
+codex plugin marketplace add hmes98318/project-standards
+codex plugin add project-standards@project-standards
 ```
 
 ## Usage
 
-In the repository where you want to create or update development standards, ask the agent to use `project-standards`:
+In the repository where you want to create or update standards, ask the agent:
 
 ```text
 Use project-standards SKILL to create or update the development standards for this repository.
 ```
 
-You can also describe the goal directly, for example:
+The skill reads the repository first, then asks one compact batch of questions for decisions it cannot infer. Unanswered items use their shown defaults.
+
+## What It Generates
 
 ```text
-Use project-standards SKILL to inspect this repository and update its development standards.
+AGENTS.md                            # repository-wide rules and routing
+CLAUDE.md                            # optional; imports AGENTS.md
+<application>/AGENTS.md              # when the application is not the repository root
+docs/standards/
+  common/development-guidelines.md   # fixed repository-wide baseline
+  <application>/                     # only the standards that application needs
 ```
 
-The Skill reads the repository before applying any general template, then asks one compact batch of questions to confirm settings that require user decisions.
+Application standards use fixed filenames, and a file is created only when it has substantive rules to hold:
 
-## What It Does
+- **Software applications:** `development.md`, `coding-style.md`, `testing.md`, `security-privacy.md`, `data.md`, `ui.md`, `performance.md`
+- **Documentation-only repositories:** `development.md`, `writing-style.md`, `testing.md`
 
-- Scans the repository layout, application boundaries, languages, frameworks, manifests, build systems, formatters, linters, tests, CI, and existing development documentation.
-- Supports single-application repositories, monorepos, and documentation-only repositories.
-- Creates or updates repository-wide and application-scoped `AGENTS.md` routing.
-- Creates development standards only for applications that actually need them, without pre-generating empty or irrelevant standards.
-- Prioritizes formatter, linter, compiler, and code-generation configuration already enforced by the repository.
-- When the project does not specify a coding-style authority, selects applicable framework guidance, the Google Style Guide, and the official language style guide in that order.
-- Preserves valid user-authored rules in update mode instead of replacing existing standards wholesale.
-- Can optionally create a thin `CLAUDE.md` adapter so Claude Code can reuse the same `AGENTS.md` instructions directly.
+## Principles
 
-## Core Principles
+- **Application scope is the boundary.** Language-, framework-, and tooling-specific rules belong to the application that owns them, so applications in a monorepo do not leak rules into each other.
+- **Standards hold durable rules, not project state.** Current architecture, module layout, deployment state, and design specifications stay in their own source-of-truth documents. Standards reference them instead of copying them.
+- **`AGENTS.md` routes; standards carry the detail.** Root instructions stay short as the project grows.
+- **Existing tooling wins.** Enforced formatter, linter, and compiler configuration comes first. Without one, the skill follows framework guidance, then the Google Style Guide, then the official language style guide.
+- **Updates preserve valid decisions.** In a repository that already has standards, the skill re-scans, keeps valid user-written rules, and does not assume existing files came from this skill or rewrite documents that need no change.
 
-### Application scope is the primary boundary
+## Settings
 
-Language-, framework-, platform-, and tooling-specific rules should belong to the application that actually owns them, rather than automatically becoming shared rules just because the same technology appears somewhere in the repository.
+The skill asks only about settings it cannot infer from the repository.
 
-This allows different applications in a monorepo to maintain their own standards while preventing rules from leaking across application boundaries.
+| Setting | Default |
+| --- | --- |
+| Documentation root | `docs/` |
+| Language of development documentation | `en-US` |
+| Git commit message language | `en-US` |
+| Claude Code `CLAUDE.md` adapters | `No` (kept if already in use) |
+| Coding style | `Automatic` per application, overridable |
+| [Code-comment policy](skills/project-standards/SKILL.md#code-comment-policy) | `Full` (or `Concise`, `None`, `Custom`) |
+| Testing policy | none; asked for each software application unless already defined |
 
-### Standards contain only durable rules
+`AGENTS.md` and standards files are always written in `en-US`. New development documentation may be created by default; ask explicitly if you do not want any. That opt-out never disables the standards themselves or the rules for existing documentation.
 
-Development standards describe how the project should be developed going forward, not what the project happens to look like today.
+## Staying Up to Date
 
-Current architecture, module layout, route inventory, deployment state, design specifications, feature inventory, and other source-of-truth project documentation are not automatically copied into standards simply because they were discovered during inspection.
+Generated `AGENTS.md` files tell agents to load the skill before documentation edits. In each task, the skill checks for a newer stable release (looked up at most once every 24 hours), updates itself without asking, and tells you which version is in use. If the skill is not installed, the agent asks before installing it.
 
-Standards may reference authoritative sources, but they should not duplicate content that can quickly become stale as the implementation changes.
-
-### `AGENTS.md` handles routing, not every detail
-
-The root `AGENTS.md` contains repository-wide instructions, hard constraints, precedence, and standards routing. Application-specific `AGENTS.md` files route only the rules that the corresponding application actually needs.
-
-This gives agents the correct standards without allowing root instructions to grow into a large monolithic document as the project evolves.
-
-### Documentation edits require the latest stable skill
-
-Generated root `AGENTS.md` files require agents to fetch the [latest release version file (`version.txt`)](https://github.com/hmes98318/project-standards/releases/latest/download/version.txt) and compare its value with the installed `metadata.version` before documentation edits. Agents automatically install or update the complete skill from that release when needed, then read and apply `SKILL.md`. If any step fails, documentation edits remain pending.
-
-### Updates preserve valid decisions first
-
-If a repository already has standards or agent instructions, `project-standards` first understands the existing content before updating it.
-
-It does not assume existing documents were generated by this Skill, and it does not rewrite documents with no substantive changes simply to make them match a template.
-
-## Good Fit For
-
-- New repositories that need consistent agent-facing development standards.
-- Repositories that already have `AGENTS.md` or standards, but whose structure no longer matches the actual application boundaries.
-- Monorepos whose applications use different languages, frameworks, or tooling.
-- Projects whose standards have accumulated outdated, duplicated, or no-longer-applicable rules over time.
-- Standards that contain too much architecture, design, deployment, or other descriptive project state and need clearer boundaries.
-- Documentation-only repositories that still need actionable and verifiable development rules.
-
-## Default Behavior
-
-`AGENTS.md` and development standards are mandatory and always use `en-US` to keep agent-facing instructions consistent.
-
-New project development documentation may be created by default when relevant. Users can explicitly opt out of creating new development documentation; that opt-out does not disable the Development Documentation rules for existing documents and never disables Project Standards themselves. The development-documentation language is user-selectable and defaults to `en-US`.
-
-Git commit message language is user-selectable and defaults to `en-US`.
-
-Coding style is selected automatically by default based on repository evidence and primary documentation, and it can be overridden for a specific application.
-
-[Code-comment policy](skills/project-standards/SKILL.md#code-comment-policy) applies only to software application code, with options `Full` (default), `Concise`, `None` (no new optional explanatory comments), or `Custom`. Development documentation and required code comments must each provide their own explanations.
-
-## Agent Skills
-
-`project-standards` uses the [Agent Skills](https://agentskills.io/) format and can be loaded by coding agents that support `SKILL.md`.
+The check is a Python 3 script that uses only the standard library, and a failed check never blocks the task. Skills installed through a plugin or a git checkout are not replaced in place; update them with the plugin manager or `git`. Set `PROJECT_STANDARDS_NO_UPDATE` to any non-empty value to disable the check.
 
 ## License
 

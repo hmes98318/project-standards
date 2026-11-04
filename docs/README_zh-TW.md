@@ -2,24 +2,15 @@
 
 [English](../README.md) · **繁體中文**
 
-讓 coding agent 依照 repository 的實際結構、tech stack 與既有規範，建立並持續維護可長期使用的開發標準。
-
-`project-standards` 是一個 Agent Skill。它會先檢查專案，再決定哪些規則應該是 repository-wide、哪些應該屬於特定 application，並以 `AGENTS.md` 作為 agent instruction 和 routing layer，將詳細且長期有效的規則維護在 development standards 中。
-
-它不是一組固定模板，也不會把目前的專案狀態直接複製成規範。產生的內容會根據實際 tooling、專案文件、coding-style authority 與使用者決策建立。
+`project-standards` 是一個 [Agent Skill](https://agentskills.io/)，用於建立並管理專案的開發規範與開發標準。
 
 ## 安裝
 
-### Codex
-
-推薦使用 Codex 原生 Plugin 安裝：
+### Skills CLI（`npx skills`）
 
 ```bash
-codex plugin marketplace add hmes98318/project-standards
-codex plugin add project-standards@project-standards
+npx skills@latest add hmes98318/project-standards
 ```
-
-之後即可在 Codex 中使用 `project-standards` Skill。
 
 ### Claude Code
 
@@ -28,97 +19,68 @@ codex plugin add project-standards@project-standards
 /plugin install project-standards@project-standards
 ```
 
-### 其他支援 Agent Skills 的工具
-
-若使用支援 Agent Skills 的其他 coding agent，可透過 Skills installer 安裝：
+### Codex
 
 ```bash
-npx skills@latest add hmes98318/project-standards
+codex plugin marketplace add hmes98318/project-standards
+codex plugin add project-standards@project-standards
 ```
 
 ## 使用
 
-在要建立或更新開發規範的 repository 中要求 agent 使用 `project-standards`：
+在要建立或更新開發標準的 repository 中，要求 agent：
 
 ```text
 Use project-standards SKILL to create or update the development standards for this repository.
 ```
 
-也可以直接描述目的，例如：
+Skill 會先讀取 repository，再以一個精簡的問題批次確認無法自行推斷的決策。未回答的項目會使用所顯示的預設值。
+
+## 產生的內容
 
 ```text
-Use project-standards SKILL to inspect this repository and update its development standards.
+AGENTS.md                            # repository-wide 規則與 routing
+CLAUDE.md                            # 選用；匯入 AGENTS.md
+<application>/AGENTS.md              # application 不在 repository 根目錄時
+docs/standards/
+  common/development-guidelines.md   # 固定的 repository-wide 基準
+  <application>/                     # 只包含該 application 需要的 standards
 ```
 
-Skill 會先讀取 repository，而不是立刻套用通用模板，再以一個精簡的問題批次確認需要使用者決策的設定。
+Application standards 使用固定檔名，且只有在有實質規則時才會建立：
 
-## 它會做什麼
+- **軟體 application：** `development.md`、`coding-style.md`、`testing.md`、`security-privacy.md`、`data.md`、`ui.md`、`performance.md`
+- **Documentation-only repository：** `development.md`、`writing-style.md`、`testing.md`
 
-- 掃描 repository layout、application boundaries、languages、frameworks、manifests、build systems、formatters、linters、tests、CI 與既有 development documentation。
-- 支援單一 application、monorepo 與 documentation-only repository。
-- 建立或更新 repository-wide 與 application-scoped `AGENTS.md` routing。
-- 只為實際需要的 application 建立 development standards，不預先產生空白或無關規範。
-- 優先遵循 repository 已強制執行的 formatter、linter、compiler 與 code-generation configuration。
-- 在沒有專案指定 coding-style authority 時，依序選擇適用的 framework guidance、Google Style Guide 與官方 language style guide。
-- 在 update mode 中保留有效的 user-authored rules，而不是整批覆寫既有規範。
-- 可選擇建立 thin `CLAUDE.md` adapter，讓 Claude Code 直接沿用相同的 `AGENTS.md` instructions。
+## 原則
 
-## 核心原則
+- **Application scope 是邊界。** Language、framework 與 tooling 相關規則屬於實際擁有它們的 application，monorepo 中的 application 不會互相污染規則。
+- **Standards 只保存長期有效的規則，不記錄專案現況。** 目前的 architecture、module layout、deployment state 與 design specification 留在各自的 source-of-truth 文件中，standards 只引用、不複製。
+- **`AGENTS.md` 負責 routing，standards 承載細節。** Root 指引不會隨專案成長而變得龐大。
+- **既有 tooling 優先。** 先遵循 repository 已強制執行的 formatter、linter 與 compiler 設定；沒有時，依序採用 framework guidance、Google Style Guide、官方 language style guide。
+- **Update 優先保留有效決策。** Repository 已有 standards 時，Skill 會重新掃描、保留有效的 user-authored 規則，不假設既有檔案由本 Skill 產生，也不改寫不需要變更的文件。
 
-### Application scope 是主要邊界
+## 設定
 
-Language、framework、platform 與 tooling-specific rules 應該屬於實際擁有它們的 application，而不是因為 repository 中出現同一種技術就自動提升成共用規則。
+Skill 只會詢問無法從 repository 推斷的設定。
 
-這讓 monorepo 中不同 application 可以維持自己的標準，同時避免規則互相污染。
+| 設定 | 預設值 |
+| --- | --- |
+| Documentation root | `docs/` |
+| 專案開發文檔語言 | `en-US` |
+| Git commit message 語言 | `en-US` |
+| Claude Code `CLAUDE.md` adapter | `No`（已在使用時沿用） |
+| Coding style | 每個 application 預設 `Automatic`，可覆寫 |
+| [程式碼註解策略](../skills/project-standards/SKILL.md#code-comment-policy) | `Full`（或 `Concise`、`None`、`Custom`） |
+| 測試策略 | 無預設；每個軟體 application 都會詢問，除非已有明確策略 |
 
-### Standards 只保存長期有效的規則
+`AGENTS.md` 與 standards 檔案固定使用 `en-US`。預設可建立新的專案開發文檔；若不想建立，請明確告知。這個選擇不會停用 standards 本身，也不會停用既有文件適用的規則。
 
-Development standards 用來描述「未來應該怎麼開發」，而不是記錄「專案現在長什麼樣子」。
+## 保持最新
 
-目前的 architecture、module layout、route inventory、deployment state、design specification、feature inventory 或其他 source-of-truth project documentation 不會因為被掃描到，就自動複製進 standards。
+產生的 `AGENTS.md` 會要求 agent 在修改文件前先載入 Skill。每個 task 中，Skill 會檢查是否有較新的穩定版（最多每 24 小時查詢一次），不經詢問自動更新，並告知目前使用的版本。若尚未安裝 Skill，agent 會先詢問，才安裝。
 
-Standards 可以引用 authoritative source，但不應該複製會隨實作變動而快速過期的內容。
-
-### `AGENTS.md` 負責 routing，不負責承載所有細節
-
-Root `AGENTS.md` 保存 repository-wide instructions、hard constraints、precedence 與 standards routing。Application-specific `AGENTS.md` 只路由該 application 真正需要的規則。
-
-這讓 agent 可以取得正確的規範，同時避免 root instructions 隨著專案成長變成龐大的單一文件。
-
-### 修改文件前必須確認 Skill 為最新穩定版
-
-產生的 root `AGENTS.md` 會要求 agent 在修改文件前，讀取[最新 Release 版本檔（`version.txt`）](https://github.com/hmes98318/project-standards/releases/latest/download/version.txt)，並將其內容與已安裝的 `metadata.version` 比對。必要時由 agent 從該 release 自動安裝或更新完整 Skill，再讀取並套用 `SKILL.md`。任何步驟失敗時，文件修改保持待處理。
-
-### Update 優先保留有效決策
-
-如果 repository 已經有 standards 或 agent instructions，`project-standards` 會先理解現有內容，再進行更新。
-
-它不假設既有文件是由本 Skill 產生，也不會只為了符合模板而改寫沒有實質變更的文件。
-
-## 適合用在
-
-- 新 repository 需要建立一致的 agent-facing development standards。
-- 已有 `AGENTS.md` 或 standards，但結構與實際 application boundaries 不一致。
-- Monorepo 中不同 application 使用不同語言、framework 或 tooling。
-- 專案演進後，既有規範包含過時、重複或已經不適用的內容。
-- Standards 混入大量 architecture、design、deployment 或其他描述性 project state，需要重新劃分邊界。
-- Documentation-only repository 也需要可執行、可驗證的 development rules。
-
-## 預設行為
-
-`AGENTS.md` 與 development standards 為強制產物，並固定使用 `en-US`，確保 agent-facing instructions 一致。
-
-一般 project development documentation 預設可在需要時建立。使用者可以明確要求不要建立新的開發文檔；這個選擇不會停用既有文件適用的 Development Documentation 規則，也不會停用 Project Standards 本身。Development documentation 的語言由使用者選擇，預設為 `en-US`。
-
-Git commit message 的語言由使用者選擇，預設為 `en-US`。
-
-Coding style 預設自動依 repository evidence 與 primary documentation 選擇，也可以針對特定 application 覆寫。
-
-[程式碼註解策略](../skills/project-standards/SKILL.md#code-comment-policy)僅適用於軟體 application 的程式碼，可選擇 `Full`（完整，預設）、`Concise`（精簡）、`None`（不新增非必要說明註解）或 `Custom`（自訂）。開發文檔與必要的 code 註解各自提供足夠說明，不能互相取代。
-
-## Agent Skills
-
-`project-standards` 採用 [Agent Skills](https://agentskills.io/) 格式，可由支援 `SKILL.md` 的 coding agents 載入與使用。
+檢查由只使用標準函式庫的 Python 3 script 執行，檢查失敗不會阻擋工作。透過 plugin 或 git checkout 安裝的 Skill 不會被原地取代，請用 plugin manager 或 `git` 更新。將 `PROJECT_STANDARDS_NO_UPDATE` 設為任何非空值即可停用檢查。
 
 ## License
 

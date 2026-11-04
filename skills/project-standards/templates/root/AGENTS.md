@@ -1,5 +1,7 @@
 # AGENTS.md
 
+<!-- project-standards: {{SKILL_VERSION}} -->
+
 ## Mandatory Instructions
 
 Before making changes, read and follow:
@@ -20,13 +22,9 @@ For application-specific changes, also follow the closest applicable `AGENTS.md`
 
 Use [project-standards](https://github.com/hmes98318/project-standards) for development-documentation rules.
 
-Before the first documentation edit in each task, including `AGENTS.md` and `{{STANDARDS_ROOT}}/`:
+Before the first documentation edit in each task, including `AGENTS.md` and `{{STANDARDS_ROOT}}/`, load the installed `project-standards` skill and complete its "Skill Version Check" first. It updates the skill automatically, without asking.
 
-1. Fetch the [latest release version file (`version.txt`)](https://github.com/hmes98318/project-standards/releases/latest/download/version.txt) and compare its value with the installed `SKILL.md`'s `metadata.version`, trimming whitespace.
-2. If the skill or version is missing, or the versions differ, automatically install or update `skills/project-standards/` from the latest stable release, including templates and scripts.
-3. Confirm the installed version matches, then read and apply `SKILL.md`.
-
-If any step fails, report the blocker and leave documentation edits pending.
+If the skill is not installed, ask the user whether to install it, following the [installation instructions](https://github.com/hmes98318/project-standards#installation), and leave documentation edits pending until it is available.
 
 ## Development Documentation
 

@@ -111,9 +111,26 @@ Rules:
 - Prefer adding a concise section to an existing canonical standard over creating a separate document when the concern does not justify its own file.
 - Create a new standards filename only when the user explicitly extends the catalog.
 
+## Skill Version Check
+
+Run this first in every task, before any documentation edit, whether the skill was invoked directly or through a repository's `AGENTS.md`:
+
+```text
+python <skill-dir>/scripts/update_skill.py --repo <repository-root>
+```
+
+`<skill-dir>` is the directory containing this `SKILL.md`; use `python3` or `py -3` where `python` is not Python 3. Pass only `--repo`, plus `--force` to skip the 24-hour lookup interval; the other flags are for testing. Never look up versions with a browser or web-fetch tool, which can return cached pages and cost far more tokens.
+
+The script updates this skill automatically when a newer stable release exists, so never ask for confirmation. It prints one JSON object and never fails the task:
+
+- Always tell the user the version in use by relaying `notice`, translated into the user's language, and `stamp_notice` when present. Do this for failures and cached results (`from_cache`) too, even if the same message was reported earlier.
+- If `reread_skill` is true, re-read this `SKILL.md` and use the updated `templates/` and `scripts/` from disk.
+- Any status other than `updated`, `current` or `ahead` (for example `check-failed`, `update-failed`, `managed`, `disabled`) means the skill could not be updated. Continue with the installed version.
+- If `stamp_status` is `repo-older`, offer update mode. Never rewrite repository files because of the stamp alone.
+
 ## Workflow
 
-Before editing documentation, follow the Documentation Skill Prerequisite in `templates/root/AGENTS.md`. For ordinary documentation edits, apply existing project rules; use the workflow below only to create or update project standards and agent routing.
+For ordinary documentation edits, apply existing project rules; use the workflow below only to create or update project standards and agent routing.
 
 ### 1. Inspect the repository
 
@@ -326,7 +343,9 @@ Use the remaining bundled files as structural templates:
 - `templates/root/scoped-AGENTS.md`
 - `templates/root/CLAUDE.md`
 
-In both create and update mode, root `AGENTS.md` must include the Documentation Skill Prerequisite and Development Documentation sections from `templates/root/AGENTS.md` unchanged after resolving placeholders.
+In both create and update mode, root `AGENTS.md` must include the Documentation Skill Prerequisite and Development Documentation sections from `templates/root/AGENTS.md` unchanged after resolving placeholders. In update mode, this replaces older wording of the Prerequisite, including the earlier `version.txt` comparison steps.
+
+Resolve `{{SKILL_VERSION}}` to the installed `metadata.version`, producing `<!-- project-standards: X.Y.Z -->` near the top of root `AGENTS.md`. In update mode, refresh the stamp only after the standards match the installed version.
 
 Use `{{DEVELOPMENT_DOCUMENTATION_CREATION_POLICY}}` only for an explicit opt-out from creating new project development documentation:
 
@@ -412,6 +431,7 @@ Before completion, verify:
 
 - root `AGENTS.md` and the required project standards exist regardless of any opt-out from creating new project development documentation;
 - `<docs-root>/standards/common/development-guidelines.md` exists and its content exactly matches `templates/common/development-guidelines.md`;
+- root `AGENTS.md` has the template's Documentation Skill Prerequisite and a version stamp equal to the installed skill version;
 - no project-specific rules or repository-derived modifications have been merged into the fixed common development-guidelines baseline;
 - every referenced file exists;
 - every application standards filename belongs to the canonical catalog unless the user explicitly extended it;
@@ -440,6 +460,7 @@ Before completion, verify:
 
 Report concisely:
 
+- the `project-standards` version in use, and the previous version if it was updated during this run;
 - create or update mode;
 - detected and confirmed application scopes and stacks;
 - documentation root;

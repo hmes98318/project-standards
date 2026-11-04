@@ -44,5 +44,18 @@ jobs:
             exit 1
           fi
 
+          for entry in \
+            ".claude-plugin/plugin.json:.version" \
+            ".claude-plugin/marketplace.json:.metadata.version" \
+            ".codex-plugin/plugin.json:.version"; do
+            file="${entry%%:*}"
+            field="${entry#*:}"
+            manifest_version="$(jq -r "$field // empty" "$file")"
+            if [[ "$VERSION" != "$manifest_version" ]]; then
+              echo "Release version $VERSION does not match $file $field (${manifest_version:-missing})" >&2
+              exit 1
+            fi
+          done
+
           printf '%s' "$VERSION" > version.txt
           gh release upload "$TAG" version.txt --clobber
