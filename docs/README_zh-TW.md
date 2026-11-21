@@ -36,6 +36,8 @@ Use project-standards SKILL to create or update the development standards for th
 
 Skill 會先讀取 repository，再以一個精簡的問題批次確認無法自行推斷的決策。未回答的項目會使用所顯示的預設值。
 
+之後若只要調整個別規則，直接提出修改即可（例如「在 web app 的測試標準加入一條規則：……」）。Skill 會把規則放進負責該主題的標準文件，不會重新跑設定問題；只有在變更需要時（例如新增應用程式）才會切換到完整流程。
+
 ## 產生的內容
 
 ```text
@@ -59,6 +61,7 @@ Application standards 使用固定檔名，且只有在有實質規則時才會�
 - **開發文檔說明系統的當前狀態。** 產生的 `AGENTS.md` 規則要求 agent 將文檔維護為對現行設計的完整技術說明，就地整合修訂，而不是持續追加修改記錄。
 - **`AGENTS.md` 負責 routing，standards 承載細節。** Root 指引不會隨專案成長而變得龐大。
 - **既有 tooling 優先。** 先遵循 repository 已強制執行的 formatter、linter 與 compiler 設定；沒有時，依序採用 framework guidance、Google Style Guide、官方 language style guide。
+- **共用 baseline 固定不變，但可記錄例外。** `common/development-guidelines.md` 永遠與 Skill 內建版本一致。若要放寬或取代其中某條規則，提出例外即可；例外會記錄在整個 repository 或單一 application 的 `AGENTS.md` 中，並在該範圍內優先適用。
 - **Update 優先保留有效決策。** Repository 已有 standards 時，Skill 會重新掃描、保留有效的 user-authored 規則，不假設既有檔案由本 Skill 產生，也不改寫不需要變更的文件。
 
 ## 設定
@@ -72,7 +75,7 @@ Skill 只會詢問無法從 repository 推斷的設定。
 | Git commit message 語言 | `en-US` |
 | Claude Code `CLAUDE.md` adapter | `No`（已在使用時沿用） |
 | Coding style | 每個 application 預設 `Automatic`，可覆寫 |
-| [程式碼註解策略](../skills/project-standards/SKILL.md#code-comment-policy) | `Full`（或 `Concise`、`None`、`Custom`） |
+| [程式碼註解策略](../skills/project-standards/references/setup-workflow.md#code-comment-policy) | `Full`（或 `Concise`、`None`、`Custom`） |
 | 測試策略 | 無預設；每個軟體 application 都會詢問，除非已有明確策略 |
 
 `AGENTS.md` 與 standards 檔案固定使用 `en-US`。預設可建立新的專案開發文檔；若不想建立，請明確告知。這個選擇不會停用 standards 本身，也不會停用既有文件適用的規則。

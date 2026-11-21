@@ -36,6 +36,8 @@ Use project-standards SKILL to create or update the development standards for th
 
 The skill reads the repository first, then asks one compact batch of questions for decisions it cannot infer. Unanswered items use their shown defaults.
 
+To change individual rules later, ask for the change directly (for example, "add a rule to the web app's testing standard that ..."). The skill places the rule in the standard that owns it without re-running the setup questions, and switches to the full workflow only when the change needs it, such as adding an application.
+
 ## What It Generates
 
 ```text
@@ -59,6 +61,7 @@ Application standards use fixed filenames, and a file is created only when it ha
 - **Development documentation explains the system as it is.** Generated `AGENTS.md` rules direct agents to keep documentation a coherent technical explanation of the current design, revised in place instead of appended with change records.
 - **`AGENTS.md` routes; standards carry the detail.** Root instructions stay short as the project grows.
 - **Existing tooling wins.** Enforced formatter, linter, and compiler configuration comes first. Without one, the skill follows framework guidance, then the Google Style Guide, then the official language style guide.
+- **The common baseline is fixed, with recorded exceptions.** `common/development-guidelines.md` always matches the skill's bundled copy. To relax or replace one of its rules, ask for an exception; it is recorded in the `AGENTS.md` of the repository or of one application and takes precedence there.
 - **Updates preserve valid decisions.** In a repository that already has standards, the skill re-scans, keeps valid user-written rules, and does not assume existing files came from this skill or rewrite documents that need no change.
 
 ## Settings
@@ -72,7 +75,7 @@ The skill asks only about settings it cannot infer from the repository.
 | Git commit message language | `en-US` |
 | Claude Code `CLAUDE.md` adapters | `No` (kept if already in use) |
 | Coding style | `Automatic` per application, overridable |
-| [Code-comment policy](skills/project-standards/SKILL.md#code-comment-policy) | `Full` (or `Concise`, `None`, `Custom`) |
+| [Code-comment policy](skills/project-standards/references/setup-workflow.md#code-comment-policy) | `Full` (or `Concise`, `None`, `Custom`) |
 | Testing policy | none; asked for each software application unless already defined |
 
 `AGENTS.md` and standards files are always written in `en-US`. New development documentation may be created by default; ask explicitly if you do not want any. That opt-out never disables the standards themselves or the rules for existing documentation.

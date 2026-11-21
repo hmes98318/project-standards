@@ -18,6 +18,10 @@ For application-specific changes, also follow the closest applicable `AGENTS.md`
 
 {{HARD_CONSTRAINTS}}
 
+## Baseline Exceptions
+
+{{BASELINE_EXCEPTIONS}}
+
 ## Documentation Skill Prerequisite
 
 This file and `{{STANDARDS_ROOT}}/` are maintained with [project-standards](https://github.com/hmes98318/project-standards).
