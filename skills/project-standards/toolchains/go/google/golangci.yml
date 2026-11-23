@@ -1,0 +1,97 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - containedctx
+    - copyloopvar
+    - depguard
+    - errorlint
+    - gocritic
+    - gosec
+    - intrange
+    - misspell
+    - modernize
+    - nakedret
+    - noctx
+    - nolintlint
+    - perfsprint
+    - revive
+    - thelper
+    - unconvert
+    - unparam
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+  settings:
+    depguard:
+      rules:
+        tests:
+          files:
+            - $test
+          deny:
+            - pkg: github.com/stretchr/testify
+              desc: assertion libraries are not allowed; use package testing with go-cmp
+            - pkg: github.com/onsi/ginkgo
+              desc: third-party test frameworks are not allowed; use package testing
+            - pkg: github.com/onsi/gomega
+              desc: assertion libraries are not allowed; use package testing with go-cmp
+            - pkg: gotest.tools
+              desc: assertion libraries are not allowed; use package testing with go-cmp
+            - pkg: github.com/matryer/is
+              desc: assertion libraries are not allowed; use package testing with go-cmp
+    errcheck:
+      check-blank: true
+    nakedret:
+      max-func-lines: 7
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+        - -ST1016
+        - -ST1020
+        - -ST1021
+        - -ST1022
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    revive:
+      enable-default-rules: false
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-naming
+        - name: error-return
+        - name: error-strings
+        - name: errorf
+        - name: exported
+        - name: import-shadowing
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: package-comments
+        - name: receiver-naming
+        - name: superfluous-else
+        - name: time-naming
+        - name: unexported-return
+        - name: var-naming
+    usetesting:
+      context-background: true
+      context-todo: true
+  exclusions:
+    presets:
+      - std-error-handling
+
+formatters:
+  enable:
+    - gofmt
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - blank
+      custom-order: true

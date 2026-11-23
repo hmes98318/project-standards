@@ -1,6 +1,6 @@
 # Setup Workflow
 
-Create or update the repository's project standards and agent routing. Read `references/standards-contract.md` first; this workflow applies it. Paths such as `references/`, `templates/`, and `scripts/` are relative to the skill directory.
+Create or update the repository's project standards and agent routing. Read `references/standards-contract.md` first; this workflow applies it, and step 4 applies `references/toolchains.md`. Paths such as `references/`, `templates/`, and `scripts/` are relative to the skill directory.
 
 ## 1. Inspect the repository
 
@@ -10,6 +10,7 @@ Identify:
 
 - repository layout and likely application boundaries;
 - languages, frameworks, manifests, package managers, build systems, linters, formatters, test frameworks, existing test suites, test commands, and CI configuration;
+- for each software application, whether formatting, linting, and type checking each already have enforced tooling, and the matching toolchain profile (`toolchain_profiles` in the inspector output);
 - testable behavior surfaces and integration boundaries for each software application, based on the responsibilities and external resources actually present in the repository;
 - existing `AGENTS.md`, `CLAUDE.md`, `.claude/`, standards, and development documentation;
 - whether existing `CLAUDE.md` files already import `@AGENTS.md` or contain user-maintained Claude-specific instructions;
@@ -30,7 +31,7 @@ In update mode, re-scan the repository, read the existing routing and standards,
 
 Infer as much as possible before asking: use repository evidence, existing standards and routing, authoritative documentation, and decisions already stated in the conversation. Do not ask for what the repository can establish reliably, and do not re-ask a decision already stated clearly.
 
-Identify the unresolved decisions that materially affect the standards, routing, document ownership, or long-term rules. The standard categories below are a checklist, not a fixed questionnaire. Ask an additional repository-specific question only when the decision cannot be inferred reliably, different reasonable answers would materially change the result, and choosing a default risks encoding an incorrect long-term rule. Do not ask exploratory, speculative, or open-ended questions, and do not offer to change application source code or tooling configuration as part of setup.
+Identify the unresolved decisions that materially affect the standards, routing, document ownership, or long-term rules. The standard categories below are a checklist, not a fixed questionnaire. Ask an additional repository-specific question only when the decision cannot be inferred reliably, different reasonable answers would materially change the result, and choosing a default risks encoding an incorrect long-term rule. Do not ask exploratory, speculative, or open-ended questions, and do not offer to change application source code, or tooling configuration beyond the toolchain decision.
 
 If nothing remains unresolved, skip the question batch and proceed with confirmed decisions, repository evidence, existing valid choices, and defaults. Otherwise present the decisions in one compact batch, using structured user-input tooling when available and a concise text format otherwise, and wait for the response before generating or updating standards.
 
@@ -72,7 +73,7 @@ Apply this policy only to software application source code. Exclude development 
 - `None` — Add no optional explanatory comments or docstrings; maintain existing comments.
 - `Custom` — Use the user's explicit coverage, detail, and exceptions.
 
-Write the selected policy's name, concrete requirements, and the shared rules below in the application's `coding-style.md`. Route that standard through the applicable `AGENTS.md` as mandatory for source changes.
+Write the selected policy's name and its requirements exactly as listed above, followed by the shared rules below verbatim, under a `## Code Comments` heading in the application's `coding-style.md`; add only the language's documentation-comment syntax and the user's stated exceptions. Route that standard through the applicable `AGENTS.md` as mandatory for source changes.
 
 - Apply coverage to new or materially changed units and fill missing required explanations within those units.
 - Use native documentation-comment syntax for contracts and nearby inline comments for implementation reasoning.
@@ -117,6 +118,12 @@ Surface      Requirement                 Depth (if Required)           Dependenc
 
 Ask for `Depth` only when `Requirement` is `Required`, and show `Dependency strategy` only for integration boundaries where it is relevant. Mark the testing-policy item `Required: Yes` when no safe default exists.
 
+### Toolchain decision
+
+For each software application with a language that has a profile in the `references/toolchains.md` catalog (see Choosing the profiles there; an application can use several) and that lacks enforced tooling for formatting, linting, or type checking, ask whether to apply each profile, in the variant chosen for the application's coding style, to the missing concerns. Name the profile and variant, the tools it would add, and the concerns existing tooling already covers. Group applications that share a profile. Options: `Apply` / `Skip`. Default: `Apply` in create mode; `Skip` in update mode, where an established codebase may fail many new checks. Explain that applying adds configuration files and development dependencies and reports existing code that fails the new checks, without changing application source code.
+
+Do not ask when every concern already has enforced tooling or no profile matches the language. The test framework is not part of this decision: the testing policy alone decides whether one is added (Choosing the toolchain for each concern in `references/toolchains.md`).
+
 ### Standard decision categories
 
 Use these categories only when they are unresolved:
@@ -129,12 +136,13 @@ Use these categories only when they are unresolved:
    - if a `CLAUDE.md` already imports `@AGENTS.md`, keep support enabled without asking;
    - if Claude Code evidence exists but no adapter is active, ask whether to enable it. Options: `Yes` / `No`. Default: `Yes`;
    - otherwise, ask whether to generate Claude Code adapters. Options: `Yes` / `No`. Default: `No`.
-6. Coding-style authority selection. Default to `Automatic` for all applications. When confirmation is needed, ask once at repository level and let the user specify only application-level overrides.
+6. Coding style. For applications whose language has a profile in the `references/toolchains.md` catalog, the style variant. Options: `Recommended` / `Google Style Guide`. Default: the variant the existing standards record, otherwise `Recommended`. For other applications, the coding-style authority. Default: `Automatic` (step 4). Ask once at repository level and let the user specify only application-level overrides.
 7. Code-comment policy for software applications. Ask when missing, ambiguous, or the user requests reconsideration. Options: `Full` / `Concise` / `None` / `Custom`. Default: the current explicit policy, otherwise `Full`. Use a shared policy with application overrides.
 8. Testing policy for each software application with testable behavior: which detected surfaces are `Required` or `Not required`, the depth for required surfaces, and dependency strategy only where an integration boundary makes it material.
-9. Repository-wide hard constraints or application-specific conventions, only when repository evidence indicates that a material rule exists but its intended policy cannot be determined reliably.
-10. The authoritative project document, only when multiple conflicting candidates exist.
-11. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
+9. Toolchain profile for each software application that lacks enforced formatting, linting, or type checking and matches a catalog profile.
+10. Repository-wide hard constraints or application-specific conventions, only when repository evidence indicates that a material rule exists but its intended policy cannot be determined reliably.
+11. The authoritative project document, only when multiple conflicting candidates exist.
+12. The preservation destination for source-of-truth content that must move out of the standards tree, only when destination or ownership is ambiguous.
 
 In create mode, confirm the development-documentation language and Git commit message language unless the conversation already states them, and require an explicit testing-policy decision for every software application with testable behavior that has no authoritative or user-stated policy. Group applications when the same policy clearly applies, and do not derive testing obligations from repository conventions.
 
@@ -142,18 +150,18 @@ In update mode, do not re-ask explicit, unambiguous existing choices unless the 
 
 After the user answers, ask at most one focused follow-up batch for newly revealed material ambiguity or missing required policy details. Resolve required testing-policy fields and any unspecified `Custom` comment requirements before proceeding; do not infer or default them. Otherwise, proceed without further setup questions.
 
-## 4. Select coding-style authorities
+## 4. Select toolchains and coding-style authorities
 
 For each application:
 
-1. Respect formatter, linter, compiler, and code-generation configuration already enforced by the repository.
-2. If the user specifies a coding-style authority, use it unless it conflicts with enforced project configuration; report the conflict instead of silently overriding it.
+1. For software applications whose language has a catalog profile, use the chosen variant's style authority and Style rules, choose the formatter, linter, and type checker for each concern, and apply the approved profile, as `references/toolchains.md` describes. Enforced repository configuration always wins. Do not research or add other style-guide rules for these applications unless the user asks.
+2. For other applications, use the coding-style authority the user specifies, unless it conflicts with enforced project configuration; report the conflict instead of silently overriding it. With `Automatic`, apply items 3 to 5 in order.
 3. Prefer official framework guidance for framework-specific patterns when it directly applies to the application.
 4. For language-level style not covered by higher-priority authorities, prefer a relevant [Google Style Guide](https://google.github.io/styleguide/) when one exists and directly applies to the language.
 5. If no suitable Google guide exists, prefer the official language coding/style guide.
 6. Verify version-sensitive or unclear behavior against primary documentation for the versions actually used by the project.
 
-Do not copy entire external style guides into project standards. Reference the authority and record only project-relevant additions, exceptions, and high-value rules.
+Do not copy entire external style guides into project standards. Reference the authority and record only project-relevant additions, exceptions, and high-value rules that tooling cannot enforce.
 
 ## 5. Generate the minimum useful standards set
 
@@ -164,10 +172,11 @@ Bring the Fixed Content to the installed version in both modes. Copy `templates/
 Use `templates/root/AGENTS.md`, `templates/root/scoped-AGENTS.md`, and `templates/root/CLAUDE.md` as structural templates. In both modes, write the template's Documentation Skill Prerequisite, Development Documentation, and Commits sections into root `AGENTS.md` with placeholders resolved, replacing any older wording even when nothing else in the file changes. Omit any other template section or list that would have no content, such as Hard Constraints or Scope-Specific Instructions, instead of filling it with placeholder text such as "None".
 
 - Resolve `{{SKILL_VERSION}}` to the installed `metadata.version`, producing `<!-- project-standards: X.Y.Z -->` near the top of root `AGENTS.md`. In update mode, refresh the stamp only after the standards match the installed version.
+- Resolve `{{VERIFICATION_COMMANDS}}` to a list of the application's verification commands, as Recording the toolchain in `references/toolchains.md` describes. In root `AGENTS.md`, resolve it only when the repository root is itself the application. Omit the section when no commands exist.
 - Resolve `{{BASELINE_EXCEPTIONS}}` only from exceptions the user explicitly requested or that are already recorded, following Baseline Exceptions in the standards contract; otherwise omit the section.
 - Resolve `{{DEVELOPMENT_DOCUMENTATION_CREATION_POLICY}}` to `- Do not create new project development documentation unless the current task explicitly requires it.` only for an explicit opt-out; otherwise remove the placeholder without adding a rule.
 
-Generate application-specific standards only from durable normative requirements supported by enforced project configuration, authoritative documentation, established project conventions, selected style authorities, primary documentation, and user answers, following the Writing Rules. Do not carry prewritten standards for a specific language, framework, platform, product domain, or project type beyond the technology-neutral baseline bundled with this skill. Every rule must trace to one of these sources; do not add generic best practices or plausible conventions that no source establishes, and do not create a standards file only to hold them. Mention a rule that seems valuable but unsupported in the Completion Report as a suggestion instead.
+Generate application-specific standards only from durable normative requirements supported by enforced project configuration, applied toolchain profiles, authoritative documentation, established project conventions, selected style authorities, primary documentation, and user answers, following the Writing Rules. Do not carry prewritten standards for a specific language, framework, platform, product domain, or project type beyond the technology-neutral baseline and the toolchain profiles bundled with this skill. Following the Enforcement Ladder, `coding-style.md` names the toolchain and its configuration files instead of restating rules the tools enforce. Every rule must trace to one of these sources; do not add generic best practices or plausible conventions that no source establishes, and do not create a standards file only to hold them. Mention a rule that seems valuable but unsupported in the Completion Report as a suggestion instead.
 
 For software applications, write `testing.md` from the confirmed testing policy rather than extrapolating from the current test suite. For each covered surface, record whether automated testing is `Required` or `Not required`; for required surfaces, the confirmed depth; dependency strategy only where it is part of the policy; and the change obligation that tells agents when tests must be added or updated. Include established test tooling and test-type conventions only where they help execute the policy. Preserve deliberate `Not required` decisions that materially constrain future changes; a policy in which every surface is `Not required` is itself substantive when it is meant to keep agents from introducing test requirements.
 
@@ -177,6 +186,7 @@ For each non-root application, create or maintain `<application>/AGENTS.md`. It 
 
 - mandatory standards for that application;
 - scope-triggered routing to additional canonical standards when needed;
+- the application's verification commands;
 - baseline exceptions recorded for that application.
 
 Do not copy repository-wide hard constraints or instruction precedence into scoped files unless a local specialization is necessary. The root `AGENTS.md` remains authoritative for repository-wide rules.
@@ -218,10 +228,13 @@ Before completion, verify:
 - root mandatory instructions contain no application-specific assumptions, common standards contain only rules every application shares, and no rule is duplicated across common and application documents without deliberate specialization;
 - when Claude Code support is enabled, every intended `CLAUDE.md` imports the local `@AGENTS.md`, duplicates no `AGENTS.md` instructions, and loses no user-maintained content;
 - each software application has its selected code-comment policy in `coding-style.md`, with mandatory routing for source changes;
+- toolchain profiles were applied only where the user approved them and only to concerns without existing enforced tooling; each applied configuration matches its profile template except at the profile's Adaptation points, with no version number typed from memory;
+- the `coding-style.md` of each application whose language has a profile records the chosen variant and contains its Style rules verbatim, except rules omitted for a reported conflict with existing tooling or with the code-comment policy, and an existing `coding-style.md` whose toolchain, variant, and code-comment policy are unchanged stays as it is;
+- the `AGENTS.md` of each application with enforced tooling lists verification commands that exist and that were run, or reported as not run with the reason, and standards do not restate rules that tooling enforces;
 - each `testing.md`, when present, matches the confirmed surfaces, depth, dependency strategy, and change obligations without strengthening them based on existing tests or tooling, and does not replace independently required build, lint, formatting, type-checking, static-analysis, or packaging validation;
 - every `AGENTS.md` and standards file is in en-US, the development-documentation and commit-message languages match the selected values, and generated Markdown is not hard-wrapped unless enforced tooling requires it;
 - an opt-out suppresses only the creation of new development documentation: standards and the Development Documentation rules stay in force, no new documents are created unless explicitly required, and no unique source-of-truth content is discarded;
-- the final diff is focused and does not modify application source code unless the user explicitly requested it.
+- the final diff is focused, changes tooling configuration and development dependencies only for approved toolchain profiles, plus a test framework where the testing policy requires tests and none existed, and does not modify application source code unless the user explicitly requested it.
 
 ## Completion Report
 
@@ -232,7 +245,8 @@ Report concisely:
 - detected and confirmed application scopes and stacks;
 - documentation root, development-documentation language and whether the user opted out of creating new development documentation, Git commit message language, and Claude Code support status;
 - files created, updated, moved, or removed;
-- selected coding-style authorities and, for software applications, code-comment policies;
+- for each software application, the toolchain per concern (existing, applied profile, or none), the verification commands, and the `verify` result, with any dependencies that could not be installed;
+- the style variant, or for languages without a profile the coding-style authority, of each application, and code-comment policies for software applications;
 - confirmed testing policy per software application, including `Required` and `Not required` surfaces, depth, and dependency strategy where relevant;
 - baseline exceptions recorded, kept, or awaiting a user decision, with their scopes;
 - source-of-truth content moved out of standards or awaiting a user decision;

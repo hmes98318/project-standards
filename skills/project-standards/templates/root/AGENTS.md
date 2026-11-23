@@ -14,6 +14,12 @@ For application-specific changes, also follow the closest applicable `AGENTS.md`
 
 {{APPLICATION_ROUTING}}
 
+## Verification
+
+Before finishing a change, run these commands and resolve every failure the change causes, without suppressing or disabling checks:
+
+{{VERIFICATION_COMMANDS}}
+
 ## Hard Constraints
 
 {{HARD_CONSTRAINTS}}

@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "format": "eslint --fix . && prettier --write .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "verify": "prettier --check . && eslint . && tsc --noEmit"
+  }
+}

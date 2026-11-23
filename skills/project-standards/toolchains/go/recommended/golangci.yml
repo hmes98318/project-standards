@@ -1,0 +1,48 @@
+version: "2"
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - containedctx
+    - copyloopvar
+    - errorlint
+    - gocritic
+    - gosec
+    - intrange
+    - misspell
+    - modernize
+    - noctx
+    - nolintlint
+    - perfsprint
+    - revive
+    - testifylint
+    - thelper
+    - unconvert
+    - unparam
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+  settings:
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+    usetesting:
+      context-background: true
+      context-todo: true
+  exclusions:
+    presets:
+      - comments
+      - std-error-handling
+
+formatters:
+  enable:
+    - gofumpt
+    - gci
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - localmodule
+      custom-order: true

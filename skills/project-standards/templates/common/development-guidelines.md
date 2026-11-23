@@ -13,6 +13,7 @@ Use these guidelines for every change.
 - Prefer established, well-maintained libraries when they reduce overall complexity or improve reliability. Do not reimplement common functionality without a clear reason.
 - Lean on the dependencies already in the project before writing your own implementation or adding packages. Do not assume a library lacks a capability without checking its documentation and types.
 - Make architectural decisions for the long term. Do not accept a stopgap that only works for now and is meant to be replaced later.
+- When the same mistake recurs, propose preventing it with types, a lint rule, or a test instead of another written instruction.
 
 ## Code quality
 
@@ -49,7 +50,7 @@ Use these guidelines for every change.
 ## Validation
 
 - Where a code-comment policy applies, review changed source against its requirements and exceptions without relying on development documentation.
-- Run the configured lint, formatting, static analysis, and other code-quality checks relevant to the changed files.
+- Run the verification commands listed in the applicable `AGENTS.md`, and any other configured lint, formatting, static analysis, and code-quality checks relevant to the changed files.
 - Run the configured build, compile, type-check, or packaging commands as applicable to validate that the project produces its expected outputs successfully.
 - Run the relevant tests for the changed behavior. Run the full configured test suite when the changes affect shared, cross-cutting, or broadly used behavior.
 - Resolve validation failures caused by the change. Do not bypass them with compatibility workarounds, broad suppressions, disabled checks, or weakened validation rules.

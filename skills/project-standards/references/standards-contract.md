@@ -24,9 +24,10 @@ CLAUDE.md                               # optional; imports @AGENTS.md
     ...only the canonical standards required by that application...
 ```
 
-- Root `AGENTS.md` defines repository-wide routing, hard constraints, repository-wide baseline exceptions, development-documentation rules, instruction precedence, and commit policy. Scoped `<application>/AGENTS.md` files route only the standards applicable to their application and hold that application's baseline exceptions.
+- Root `AGENTS.md` defines repository-wide routing, hard constraints, repository-wide baseline exceptions, development-documentation rules, instruction precedence, commit policy, and the verification commands of an application at the repository root. Scoped `<application>/AGENTS.md` files route only the standards applicable to their application and hold that application's baseline exceptions and verification commands.
 - `<docs-root>/standards/common/development-guidelines.md` is the fixed repository-wide engineering baseline and must exactly mirror `templates/common/development-guidelines.md` (see Fixed Content). `common/` otherwise holds only rules that truly apply across all application scopes and technology stacks; a rule shared only because applications currently use the same implementation stays application-scoped.
 - Language-, framework-, platform-, and tool-specific rules belong to the owning application scope. Match a standards directory name to its application directory name when practical.
+- Toolchain configuration, such as formatter, linter, and type-checker configuration files, lives in the application directory where the tools read it, not in the standards tree.
 - Create only the application scopes and standards the repository and current requirements need.
 
 ## Standards Boundary
@@ -44,6 +45,16 @@ Descriptive and source-of-truth documentation stays outside the standards tree, 
 
 If authoritative content that is not itself a development standard exists only inside the standards tree, preserve it outside before removing or replacing the original file: in an existing suitable location, or in `<docs-root>/design/` for design documentation when none exists. Move the content intact and update references. Change history is not authoritative content: remove it instead of relocating it. Ask the user when the destination or ownership is ambiguous.
 
+## Enforcement Ladder
+
+Agents reliably follow a rule that fails a check, and often skip prose they are only told to read. Place each development rule at the highest level that can hold it:
+
+1. **Tooling** — the formatter, linter, type checker, compiler settings, and tests run by the application's verification commands. A rule a configured tool enforces lives in that tool's configuration, selected as `references/toolchains.md` describes.
+2. **`AGENTS.md`** — the verification commands and the few instructions every change in the scope needs, because agents read it on every task.
+3. **Standards** — rules that need judgment, such as the code-comment policy, the testing policy, and design conventions no tool checks.
+
+Standards never restate a rule that configured tooling enforces; they name the tool and its configuration instead.
+
 ## Canonical Standards Catalog
 
 Application standards must use the canonical filenames below. Create only files that contain substantive rules for the application. Do not invent alternate filenames for concerns already covered by the catalog.
@@ -51,7 +62,7 @@ Application standards must use the canonical filenames below. Create only files 
 ### Software applications
 
 - `development.md` — application-specific engineering practices, framework and dependency usage rules, build/configuration practices, generated-code policies, and durable implementation constraints.
-- `coding-style.md` — language and framework coding style, naming, formatting, comments, and code-structure conventions.
+- `coding-style.md` — the formatting, linting, and type-checking toolchain and its configuration files, coding-style authorities, the code-comment policy, naming and code-structure conventions that tooling does not enforce, and the Style rules of an applied toolchain profile, which stay here even where they touch topics that other files own.
 - `testing.md` — automated-testing policy, test-surface requirements, testing depth, change obligations, integration dependency strategy, test-writing rules, and test-tooling conventions.
 - `security-privacy.md` — security, authentication, authorization, secrets, sensitive data, privacy, permissions, and related safeguards.
 - `data.md` — networking, persistence, caching, serialization, migrations, and data-access conventions.
