@@ -2,7 +2,7 @@
 name: project-standards
 description: Inspect a repository and create or update durable, application-scoped development standards and agent instruction routing. Also load before editing AGENTS.md, files under the standards tree, or development documentation in a repository whose AGENTS.md requires project-standards.
 metadata:
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Project Standards
